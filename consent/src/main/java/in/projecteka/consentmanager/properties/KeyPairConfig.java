@@ -52,7 +52,14 @@ public class KeyPairConfig {
     @SneakyThrows
     private KeyPair getKeyPairForAlias(String keyPairAlias, String keyPairType) {
         final KeyStore keyStore = KeyStore.getInstance(keyPairType);
+        log.info("keyStorePath: {}", keyStoreFilePath);
         File file = new File(keyStoreFilePath);
+        log.info("file: {}", file);
+        log.info("Absolute path: {}", file.getAbsolutePath());
+        log.info("isFile: {}", file.isFile());
+        log.info("isDirectory: {}", file.isDirectory());
+        log.info("file.canRead(): {}", file.canRead());
+
         char[] pwdArray = keyStorePassword.toCharArray();
         keyStore.load(new FileInputStream(file), pwdArray);
         Certificate certificate = keyStore.getCertificate(keyPairAlias);
