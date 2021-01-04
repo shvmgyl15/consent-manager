@@ -53,13 +53,15 @@ public class KeyPairConfig {
     private KeyPair getKeyPairForAlias(String keyPairAlias, String keyPairType) {
         final KeyStore keyStore = KeyStore.getInstance(keyPairType);
         log.info("keyStorePath: {}", keyStoreFilePath);
+        System.out.println(new File(".").getAbsolutePath());
         File file = new File(keyStoreFilePath);
         log.info("file: {}", file);
-        log.info("path: {}", file.getPath());
-        log.info("Absolute path: {}", file.getAbsolutePath());
+        log.info("file.exists(): {}", file.exists());
+        log.info("file path: {}", file.getPath());
+        log.info("file Absolute path: {}", file.getAbsolutePath());
         log.info("file Parent: {}", file.getParent());
-        log.info("isFile: {}", file.isFile());
-        log.info("isDirectory: {}", file.isDirectory());
+        log.info("file isFile: {}", file.isFile());
+        log.info("file isDirectory: {}", file.isDirectory());
         if(file.isDirectory()) {
             System.out.println("list directory:" + file.list().toString());
         }
