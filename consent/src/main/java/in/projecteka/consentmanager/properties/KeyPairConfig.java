@@ -55,9 +55,14 @@ public class KeyPairConfig {
         log.info("keyStorePath: {}", keyStoreFilePath);
         File file = new File(keyStoreFilePath);
         log.info("file: {}", file);
+        log.info("path: {}", file.getPath());
         log.info("Absolute path: {}", file.getAbsolutePath());
+        log.info("file Parent: {}", file.getParent());
         log.info("isFile: {}", file.isFile());
         log.info("isDirectory: {}", file.isDirectory());
+        if(file.isDirectory()) {
+            System.out.println("list directory:" + file.list().toString());
+        }
         log.info("file.canRead(): {}", file.canRead());
 
         char[] pwdArray = keyStorePassword.toCharArray();
