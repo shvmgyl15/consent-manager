@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: consent
-          image: devinfysurveyappregistry.azurecr.io/consent:latest
+          image: devinfysurveyappregistry.azurecr.io/consent-test:latest
           env:
           - name: "SERVER_PORT"
             value: "9000"

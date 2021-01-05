@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: dataflow
-          image: devinfysurveyappregistry.azurecr.io/dataflow:latest
+          image: devinfysurveyappregistry.azurecr.io/dataflow-test:latest
           env:
           - name: "SERVER_PORT"
             value: "8090"

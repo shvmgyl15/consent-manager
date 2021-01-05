@@ -16,7 +16,7 @@ pipeline {
 					sh 'docker push $SECRET".azurecr.io/consent-testt:${BUILD_NUMBER}"'
                     sh 'kubectl apply -f consent/kubernetes/deployment.yml'
                     sh 'kubectl apply -f consent/kubernetes/service.yml'
-                    sh 'kubectl set image deployment/consent-test  consent-test=$SECRET".azurecr.io/consent-test:${BUILD_NUMBER}" -n consent-manager'
+                    sh 'kubectl set image deployment/consent  consent=$SECRET".azurecr.io/consent-test:${BUILD_NUMBER}" -n consent-manager'
 				}
                 
 			}
@@ -36,7 +36,7 @@ pipeline {
 					sh 'docker push $SECRET".azurecr.io/dataflow-testt:${BUILD_NUMBER}"'
                     sh 'kubectl apply -f dataflow/kubernetes/deployment.yml'
                     sh 'kubectl apply -f dataflow/kubernetes/service.yml'
-                    sh 'kubectl set image deployment/dataflow-test  dataflow-test=$SECRET".azurecr.io/dataflow-test:${BUILD_NUMBER}" -n consent-manager'
+                    sh 'kubectl set image deployment/dataflow  dataflow=$SECRET".azurecr.io/dataflow-test:${BUILD_NUMBER}" -n consent-manager'
 				}
                 
 			}
