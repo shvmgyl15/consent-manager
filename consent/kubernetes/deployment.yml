@@ -1,0 +1,175 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: consent-manager
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consent
+  namespace: consent-manager
+  labels:
+    app: consent
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: consent
+  template:
+    metadata:
+      labels:
+        app: consent
+    spec:
+      containers:
+        - name: consent
+          image: devinfysurveyappregistry.azurecr.io/consent:latest
+          env:
+          - name: "SERVER_PORT"
+            value: "9000"
+          # consentservice
+          - name: "DEFAULT_PAGE_SIZE"
+            value: "20"
+          - name: "MAX_PAGE_SIZE"
+            value: "100"
+          - name: "CONSENT_SERVICE_URL"
+            value: ""
+          - name: "CONSENT_REQUEST_EXPIRY"
+            value: "60"
+          - name: "CONSENT_SERVICE_NAME"
+            value: "PHR-App"
+          # scheduler
+          - name: "CONSENT_EXPIRY_CRON_ENABLED"
+            value: "true"
+          - name: "CONSENT_EXPIRY_CRON_ENABLED"
+            value: "true"
+          - name: "CONSENT_EXPIRY_CRON_EXPRESSION"
+            value: "0 0 * ? * *"
+          - name: "CONSENT_REQUEST_EXPIRY_CRON_EXPRESSION"
+            value: "0 0 0/12 ? * *"
+          # clientregistry
+          - name: "CLIENT_REGISTRY_URL"
+            value: "http://20.40.2.56:8080"
+          # gatewayservice
+          - name: "GATEWAY_BASE_URL"
+            value: "http://10.0.2.199:8000/v0.5"
+          - name: "GATEWAY_REQUEST_TIMEOUT"
+            value: "5000"
+          - name: "GATEWAY_CLIENT_SECRET"
+            value: "edbf171c-9b87-4a0a-9403-48c42c373735"
+          - name: "GATEWAY_CLIENT_ID"
+            value: "ncg"
+          - name: "CENTRAL_REGISTRY_JWK_URL"
+            value: "http://10.0.2.199:8000/v0.5/certs"
+          - name: "TOKEN_EXPIRY"
+            value: "10"
+          # userservice
+          - name: "USER_SERVICE_URL"
+            value: ""
+          # otpservice
+          - name: "OTP_SERVICE_URL"
+            value: "http://10.0.2.201:80"
+          - name: "OTP_EXPIRY_IN_MINUTES"
+            value: "5"
+          # jwt
+          #          - name: ""
+          # value: ""
+          # authorization
+          - name: "AUTHORIZATION_HEADER"
+            value: "Authorization"
+          # keycloak
+          - name: "KEY_CLOAK_URL"
+            value: "http://20.40.6.45:8080/auth"
+          - name: "KEY_CLOAK_CONSENT_CLIENT_ID"
+            value: "consent-manager"
+          - name: "KEY_CLOAK_CONSENT_CLIENT_SECRET"
+            value: "27076830-b2be-44ac-ac42-ab69be47766d"
+          - name: "KEY_CLOAK_CONSENT_USER_NAME"
+            value: "consent-service-admin-user"
+          - name: "KEY_CLOAK_CONSENT_PASSWORD"
+            value: "welcome"
+          - name: "KEY_CLOAK_JWK_URL"
+            value: "http://20.40.6.45:8080/auth/realms/consent-manager/protocol/openid-connect/certs"
+          - name: "KEY_CLOAK_TOKEN_ISSUER"
+            value: "http://20.40.6.45:8080/auth/realms/consent-manager"
+          # Database
+          - name: "POSTGRES_HOST"
+            value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
+          - name: "POSTGRES_PORT"
+            value: "5432"
+          - name: "CONSENT_MANAGER_DB_NAME"
+            value: "consent_manager"
+          - name: "POSTGRES_USER"
+            value: "infysurveydev@infy-survey-app"
+          - name: "POSTGRES_PASSWORD"
+            value: "infy@123_"
+          # linkservice
+          - name: "LINK_SERVICE_URL"
+            value: ""
+          - name: "LINK_TRANSACTION_TIMEOUT"
+            value: "5000"
+          # Valid values are guava(for local), redis
+          - name: "CACHE_METHOD"
+            value: "guava"
+          # Redis Config: Will not be used if cacheMethod is guava
+          - name: "REDIS_HOST"
+            value: "localhost"
+          - name: "REDIS_PORT"
+            value: "6379"
+          - name: "REDIS_PASSWORD"
+            value: "password"
+          - name: "REDIS_KEY_EXPIRY"
+            value: "5"
+          - name: "ROOT_NAMESPACE"
+            value: "gateway"
+          - name: "KEEP_ALIVE_ENABLED"
+            value: "false"
+          - name: "REDIS_RETRY"
+            value: "0"
+          # listeners
+          - name: "LISTENERS_MAXIMUM_RETRIES"
+            value: "10"
+          - name: "LISTENERS_RETRY_INTERVAL"
+            value: "1000"
+          # nhsproperties
+          - name: "NHS_HIU_ID"
+            value: "12342345"
+          # linktokencache
+          - name: "LINK_TOKEN_CACHE_EXPIRY"
+            value: "1440"
+          # RabbitMQ
+          - name: "RABBITMQ_HOST"
+            value: "10.0.2.9"
+          - name: "RABBITMQ_PORT"
+            value: "5672"
+          - name: "RABBITMQ_USERNAME"
+            value: "guest"
+          - name: "RABBITMQ_PASSWORD"
+            value: "guest"
+          # keystore
+          - name: "KEYSTORE_PATH"
+            value: "/consent-manager-local-keystore.p12"
+          - name: "KEYSTORE_PASSWORD"
+            value: "password"
+          - name: "SIGN_ARTEFACT_KEYPAIR_ALIAS"
+            value: "test-sign-artefact"
+          - name: "PIN_VERIFICATION_KEYPAIR_ALIAS"
+            value: "test-pin-verification"
+          # Web Client
+          - name: "USE_HTTP_CONNECTION_POOL"
+            value: "true"
+          # Http Connection Pool
+          - name: "HTTP_CONNECTION_POOL_SIZE"
+            value: "500"
+          - name: "HTTP_CONNECTION_MAX_LIFETIME"
+            value: "10"
+          - name: "HTTP_CONNECTION_MAX_IDLETIME"
+            value: "5"
+
+          ports:
+            - containerPort: 9000
