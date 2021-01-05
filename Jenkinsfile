@@ -4,7 +4,9 @@ pipeline {
 	stages {
 	        stage('Configue ACR login') {
         		steps {
-                		sh 'az acr login --name $SECRET'
+				withCredentials([string(credentialsId: 'Azure-Container-Registry', variable: 'SECRET')]) {
+                			sh 'az acr login --name $SECRET'
+				}
 	            	}
         	}
 		stage('Deploying Consent') {
