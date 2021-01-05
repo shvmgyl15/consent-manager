@@ -43,9 +43,8 @@ public class KeyPairConfig {
     @SneakyThrows
     private KeyPair getKeyPairForAlias(String keyPairAlias, String keyPairType) {
         final KeyStore keyStore = KeyStore.getInstance(keyPairType);
-        File file = new File(keyStoreFilePath);
         char[] pwdArray = keyStorePassword.toCharArray();
-        keyStore.load(new FileInputStream(file), pwdArray);
+        keyStore.load(getClass().getResourceAsStream(keyStoreFilePath), pwdArray);
         Certificate certificate = keyStore.getCertificate(keyPairAlias);
         if (certificate == null) {
             logger.error("No certificate found for given keystore 'alias'");
