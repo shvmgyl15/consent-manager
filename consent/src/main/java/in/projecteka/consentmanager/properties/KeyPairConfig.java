@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -52,23 +50,8 @@ public class KeyPairConfig {
     @SneakyThrows
     private KeyPair getKeyPairForAlias(String keyPairAlias, String keyPairType) {
         final KeyStore keyStore = KeyStore.getInstance(keyPairType);
-        log.info("keyStorePath: {}", keyStoreFilePath);
-        System.out.println(new File(".").getAbsolutePath());
-        File file = new File(keyStoreFilePath);
-        log.info("file: {}", file);
-        log.info("file.exists(): {}", file.exists());
-        log.info("file path: {}", file.getPath());
-        log.info("file Absolute path: {}", file.getAbsolutePath());
-        log.info("file Parent: {}", file.getParent());
-        log.info("file isFile: {}", file.isFile());
-        log.info("file isDirectory: {}", file.isDirectory());
-        if(file.isDirectory()) {
-            System.out.println("list directory:" + file.list().toString());
-        }
-        log.info("file.canRead(): {}", file.canRead());
-
         char[] pwdArray = keyStorePassword.toCharArray();
-        keyStore.load(new FileInputStream(file), pwdArray);
+        keyStore.load(getClass().getResourceAsStream(keyStoreFilePath), pwdArray);
         Certificate certificate = keyStore.getCertificate(keyPairAlias);
         if (certificate == null) {
             log.error("No certificate found for given keystore 'alias'");
