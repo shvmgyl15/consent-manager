@@ -11,6 +11,7 @@ pipeline {
         	}
 		stage('Change java version to 11') {
 			steps {
+				sh './script.sh'
 				sh 'sdk use java 11.0.2-open'
 			}
 		}
