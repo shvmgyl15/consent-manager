@@ -9,6 +9,12 @@ pipeline {
 				}
 	            	}
         	}
+		stage('Change java version to 11') {
+			steps {
+				sh 'source "$HOME/.sdkman/bin/sdkman-init.sh"'
+				sh 'sdk use java 11.0.2-open'
+			}
+		}
 		stage('Deploying Consent') {
 			steps {
 				sh './gradlew :consent:build'
