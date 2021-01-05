@@ -55,7 +55,7 @@ consentmanager:
   linktokencache:
     expiry: 1440
 keystore:
-  file-path: "consent-manager-local-keystore.p12"
+  file-path: "/consent-manager-local-keystore.p12"
   password: password
   sign-artefact-keypair:
     store-type: PKCS12
