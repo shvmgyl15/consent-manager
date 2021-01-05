@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: consent-manager
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dataflow
+  namespace: consent-manager
+  labels:
+    app: dataflow
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: dataflow
+  template:
+    metadata:
+      labels:
+        app: dataflow
+    spec:
+      containers:
+        - name: dataflow
+          image: devinfysurveyappregistry.azurecr.io/dataflow:latest
+          env:
+          - name: "SERVER_PORT"
+            value: "8090"
+          # gatewayservice
+          - name: "GATEWAY_BASE_URL"
+            value: "http://10.0.2.199:8000/v0.5"
+          - name: "GATEWAY_REQUEST_TIMEOUT"
+            value: "5000"
+          - name: "GATEWAY_CLIENT_SECRET"
+            value: "edbf171c-9b87-4a0a-9403-48c42c373735"
+          - name: "GATEWAY_CLIENT_ID"
+            value: "ncg"
+          - name: "CENTRAL_REGISTRY_JWK_URL"
+            value: "http://10.0.2.199:8000/v0.5/certs"
+          # consentmanager
+          - name: "CONSENT_MANAGER_URL"
+            value: "http://20.40.4.111:9000"
+          # Database
+          - name: "POSTGRES_HOST"
+            value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
+          - name: "POSTGRES_PORT"
+            value: "5432"
+          - name: "CONSENT_MANAGER_DB_NAME"
+            value: "consent_manager"
+          - name: "POSTGRES_USER"
+            value: "infysurveydev@infy-survey-app"
+          - name: "POSTGRES_PASSWORD"
+            value: "infy@123_"
+          # keycloak
+          - name: "KEY_CLOAK_URL"
+            value: "http://20.40.6.45:8080/auth"
+          - name: "KEY_CLOAK_CONSENT_CLIENT_ID"
+            value: "consent-manager"
+          - name: "KEY_CLOAK_CONSENT_CLIENT_SECRET"
+            value: "27076830-b2be-44ac-ac42-ab69be47766d"
+          - name: "KEY_CLOAK_JWK_URL"
+            value: "http://20.40.6.45:8080/auth/realms/consent-manager/protocol/openid-connect/certs"
+          # Valid values are guava(for local), redis
+          - name: "CACHE_METHOD"
+            value: "guava"
+          # Redis Config: Will not be used if cacheMethod is guava
+          - name: "REDIS_HOST"
+            value: "localhost"
+          - name: "REDIS_PORT"
+            value: "6379"
+          - name: "REDIS_PASSWORD"
+            value: "password"
+          - name: "REDIS_KEY_EXPIRY"
+            value: "5"
+          - name: "ROOT_NAMESPACE"
+            value: "gateway"
+          - name: "KEEP_ALIVE_ENABLED"
+            value: "false"
+          - name: "REDIS_RETRY"
+            value: "0"
+          # RabbitMQ
+          - name: "RABBITMQ_HOST"
+            value: "10.0.2.9"
+          - name: "RABBITMQ_PORT"
+            value: "5672"
+          - name: "RABBITMQ_USERNAME"
+            value: "guest"
+          - name: "RABBITMQ_PASSWORD"
+            value: "guest"
+            
+          ports:
+            - containerPort: 8090
