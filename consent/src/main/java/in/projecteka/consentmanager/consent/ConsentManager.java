@@ -269,6 +269,8 @@ public class ConsentManager {
     public Mono<ConsentApprovalResponse> approveConsent(String patientId,
                                                         String requestId,
                                                         List<GrantedConsent> grantedConsents) {
+        System.out.println("patientId: " + patientId + ", requestId: " + requestId);
+        logger.debug("patientId: " + patientId + ", requestId: " + requestId);
         return validatePatient(patientId)
                 .then(validateDate(grantedConsents))
                 .then(validateHiTypes(in(grantedConsents)))
