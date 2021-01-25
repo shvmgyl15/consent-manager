@@ -11,7 +11,7 @@ pipeline {
 					sh 'ls'
 					sh 'docker login -u AWS -p $(aws ecr get-login-password --region $REGION) $REGISTRY_NAME'
 					sh 'echo $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
-					sh 'docker build . -t  $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
+					sh 'docker build -f consent -t  $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
 					sh 'docker push $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
 				}
 
@@ -47,7 +47,7 @@ pipeline {
 					sh 'ls'
 					sh 'docker login -u AWS -p $(aws ecr get-login-password --region $REGION) $REGISTRY_NAME'
 					sh 'echo $REGISTRY_NAME"/consent-manager/user:${BUILD_NUMBER}"'
-					sh 'docker build . -t  $REGISTRY_NAME"/consent-manager/user:${BUILD_NUMBER}"'
+					sh 'docker build user -t  $REGISTRY_NAME"/consent-manager/user:${BUILD_NUMBER}"'
 					sh 'docker push $REGISTRY_NAME"/consent-manager/user:${BUILD_NUMBER}"'
 				}
 
@@ -83,7 +83,7 @@ pipeline {
 					sh 'ls'
 					sh 'docker login -u AWS -p $(aws ecr get-login-password --region $REGION) $REGISTRY_NAME'
 					sh 'echo $REGISTRY_NAME"/consent-manager/dataflow:${BUILD_NUMBER}"'
-					sh 'docker build . -t  $REGISTRY_NAME"/consent-manager/dataflow:${BUILD_NUMBER}"'
+					sh 'docker build dataflow -t  $REGISTRY_NAME"/consent-manager/dataflow:${BUILD_NUMBER}"'
 					sh 'docker push $REGISTRY_NAME"/consent-manager/dataflow:${BUILD_NUMBER}"'
 				}
 
