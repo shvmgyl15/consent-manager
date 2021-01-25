@@ -11,7 +11,7 @@ pipeline {
 					sh 'ls'
 					sh 'docker login -u AWS -p $(aws ecr get-login-password --region $REGION) $REGISTRY_NAME'
 					sh 'echo $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
-					sh 'docker build -f consent -t  $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
+					sh 'docker build  consent -t  $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
 					sh 'docker push $REGISTRY_NAME"/consent-manager/consent:${BUILD_NUMBER}"'
 				}
 
