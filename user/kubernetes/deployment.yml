@@ -59,7 +59,7 @@ spec:
           - name: "GATEWAY_REQUEST_TIMEOUT"
             value: "5000"
           - name: "GATEWAY_CLIENT_SECRET"
-            value: "edbf171c-9b87-4a0a-9403-48c42c373735"
+            value: "5eeffb2e-72e0-4f78-95e3-19155f47aaf2"
           - name: "GATEWAY_CLIENT_ID"
             value: "ncg"
           - name: "GATEWAY_JWK_URL"
