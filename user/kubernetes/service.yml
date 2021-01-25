@@ -5,13 +5,13 @@ metadata:
   namespace: consent-manager
   labels:
     app: user-test
-  # annotations:
-  #   service.beta.kubernetes.io/do-loadbalancer-algorithm: "least_connections"
-  #   service.beta.kubernetes.io/azure-load-balancer-internal: "true" 
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-algorithm: "least_connections"
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true" 
 spec:
   selector:
     app: user-test
-  sessionAffinity: ClientIP
+    #sessionAffinity: ClientIP
   type: LoadBalancer
   # sessionAffinityConfig:
   #   clientIP:

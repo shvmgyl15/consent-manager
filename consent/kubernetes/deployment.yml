@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: consent
-          image: devinfysurveyappregistry.azurecr.io/consent:latest
+          image: 413379950444.dkr.ecr.us-east-2.amazonaws.com/consent-manager/consent:latest 
           env:
           - name: "SERVER_PORT"
             value: "9000"
@@ -54,10 +54,10 @@ spec:
             value: "0 0 0/12 ? * *"
           # clientregistry
           - name: "CLIENT_REGISTRY_URL"
-            value: "http://20.40.2.56:8080"
+            value: "http://a275e34436d4f4bc6b32fddca3a084a8-110520610.us-east-2.elb.amazonaws.com:8080"
           # gatewayservice
           - name: "GATEWAY_BASE_URL"
-            value: "http://10.0.2.199:8000/v0.5"
+            value: "http://aa7e8390b4a8f4363a90f79137f62c68-2022049164.us-east-2.elb.amazonaws.com:8000/v0.5"
           - name: "GATEWAY_REQUEST_TIMEOUT"
             value: "5000"
           - name: "GATEWAY_CLIENT_SECRET"
@@ -70,44 +70,44 @@ spec:
             value: "10"
           # userservice
           - name: "USER_SERVICE_URL"
-            value: "http://20.40.3.253:7000"
+            value: "http://a0f877610313b43f1ac9554f3bb27561-1594968060.us-east-2.elb.amazonaws.com:7000"
           # otpservice
           - name: "OTP_SERVICE_URL"
-            value: "http://10.0.2.201:80"
+            value: "http://a70651f25675c49e2b5a971f145db1df-2015175170.us-east-2.elb.amazonaws.com:80"
           - name: "OTP_EXPIRY_IN_MINUTES"
             value: "5"
           # jwt
-          #          - name: ""
+          #- name: ""
           # value: ""
           # authorization
           - name: "AUTHORIZATION_HEADER"
             value: "Authorization"
           # keycloak
           - name: "KEY_CLOAK_URL"
-            value: "http://20.40.6.45:8080/auth"
+            value: "http://a1e12bb8b0a7545e0b08b6ecb5e9c3d7-48752150.us-east-2.elb.amazonaws.com:8080/auth"
           - name: "KEY_CLOAK_CONSENT_CLIENT_ID"
             value: "consent-manager"
           - name: "KEY_CLOAK_CONSENT_CLIENT_SECRET"
-            value: "27076830-b2be-44ac-ac42-ab69be47766d"
+            value: "3b3d867c-55cc-4b28-a7e2-eb53f3a15165"
           - name: "KEY_CLOAK_CONSENT_USER_NAME"
             value: "consent-service-admin-user"
           - name: "KEY_CLOAK_CONSENT_PASSWORD"
             value: "welcome"
           - name: "KEY_CLOAK_JWK_URL"
-            value: "http://20.40.6.45:8080/auth/realms/consent-manager/protocol/openid-connect/certs"
+            value: "http://a1e12bb8b0a7545e0b08b6ecb5e9c3d7-48752150.us-east-2.elb.amazonaws.com:8080/auth/realms/consent-manager/protocol/openid-connect/certs"
           - name: "KEY_CLOAK_TOKEN_ISSUER"
-            value: "http://20.40.6.45:8080/auth/realms/consent-manager"
+            value: "http://a1e12bb8b0a7545e0b08b6ecb5e9c3d7-48752150.us-east-2.elb.amazonaws.com:8080/auth/realms/consent-manager"
           # Database
           - name: "POSTGRES_HOST"
-            value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
+            value: "172.16.10.131"
           - name: "POSTGRES_PORT"
             value: "5432"
           - name: "CONSENT_MANAGER_DB_NAME"
             value: "consent_manager"
           - name: "POSTGRES_USER"
-            value: "infysurveydev@infy-survey-app"
+            value: "postgres"
           - name: "POSTGRES_PASSWORD"
-            value: "infy@123_"
+            value: "8U-BWr9Gz!276zLe"
           # linkservice
           - name: "LINK_SERVICE_URL"
             value: ""
@@ -144,7 +144,7 @@ spec:
             value: "1440"
           # RabbitMQ
           - name: "RABBITMQ_HOST"
-            value: "10.0.2.9"
+            value: "a1147c0a10bd24fd0bf0f7acb4846697-2045861127.us-east-2.elb.amazonaws.com"
           - name: "RABBITMQ_PORT"
             value: "5672"
           - name: "RABBITMQ_USERNAME"
