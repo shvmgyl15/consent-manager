@@ -11,7 +11,7 @@ metadata:
 spec:
   selector:
     app: haproxy-test
-  sessionAffinity: ClientIP
+  #sessionAffinity: ClientIP
   type: LoadBalancer
   # sessionAffinityConfig:
   #   clientIP:

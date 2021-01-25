@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: haproxy-test
-          image: devinfysurveyappregistry.azurecr.io/haproxy-test:latest
+          image: 413379950444.dkr.ecr.us-east-2.amazonaws.com/consent-manager/haproxy:latest
           
           ports:
             - name: http
