@@ -79,7 +79,7 @@ pipeline {
                         steps {
                                 withCredentials([string(credentialsId: 'EKS-Region', variable: 'REGION'), string(credentialsId: 'Registry-Name', variable: 'REGISTRY_NAME')]) {
 
-					sh './userBuild.sh'
+					sh './dataflowBuild.sh'
 					sh 'ls'
 					sh 'docker login -u AWS -p $(aws ecr get-login-password --region $REGION) $REGISTRY_NAME'
 					sh 'echo $REGISTRY_NAME"/consent-manager/dataflow:${BUILD_NUMBER}"'
