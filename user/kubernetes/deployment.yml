@@ -7,10 +7,10 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: consent
+  name: user-test
   namespace: consent-manager
   labels:
-    app: consent
+    app: user-test
 spec:
   replicas: 1
   strategy:
@@ -20,41 +20,39 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: consent
+      app: user-test
   template:
     metadata:
       labels:
-        app: consent
+        app: user-test
     spec:
       containers:
-        - name: consent
-          image: devinfysurveyappregistry.azurecr.io/consent:latest
+        - name: user-test
+          image: devinfysurveyappregistry.azurecr.io/user-test:latest
           env:
           - name: "SERVER_PORT"
-            value: "9000"
-          # consentservice
-          - name: "DEFAULT_PAGE_SIZE"
-            value: "20"
-          - name: "MAX_PAGE_SIZE"
-            value: "100"
-          - name: "CONSENT_SERVICE_URL"
-            value: ""
-          - name: "CONSENT_REQUEST_EXPIRY"
-            value: "60"
-          - name: "CONSENT_SERVICE_NAME"
+            value: "7000"
+          # user
+          - name: "CONSENT_APP_NAME"
             value: "PHR-App"
-          # scheduler
-          - name: "CONSENT_EXPIRY_CRON_ENABLED"
-            value: "true"
-          - name: "CONSENT_EXPIRY_CRON_ENABLED"
-            value: "true"
-          - name: "CONSENT_EXPIRY_CRON_EXPRESSION"
-            value: "0 0 * ? * *"
-          - name: "CONSENT_REQUEST_EXPIRY_CRON_EXPRESSION"
-            value: "0 0 0/12 ? * *"
-          # clientregistry
-          - name: "CLIENT_REGISTRY_URL"
-            value: "http://20.40.2.56:8080"
+          - name: "TRANSACTION_PIN_DIGIT_SIZE"
+            value: "4"
+          - name: "TRANSACTION_PIN_TOKEN_VALIDITY"
+            value: "2"
+          - name: "USER_CREATION_TOKEN_VALIDITY"
+            value: "5"
+          - name: "USER_ID_SUFFIX"
+            value: "@ncg"
+          - name: "MAX_OTP_ATTEMPTS"
+            value: "2"
+          - name: "MAX_OTP_ATTEMPTS_PERIOD_IN_MIN"
+            value: "1"
+          - name: "OTP_ATTEMPTS_BLOCK_PERIOD_IN_MIN"
+            value: "1"
+          - name: "OTP_INVALID_ATTEMPT_BLOCK_PERIOD_IN_MIN"
+            value: "1"
+          - name: "MAX_INVALID_OTP_ATTEMPTS"
+            value: "3"
           # gatewayservice
           - name: "GATEWAY_BASE_URL"
             value: "http://10.0.2.199:8000/v0.5"
@@ -64,21 +62,21 @@ spec:
             value: "edbf171c-9b87-4a0a-9403-48c42c373735"
           - name: "GATEWAY_CLIENT_ID"
             value: "ncg"
-          - name: "CENTRAL_REGISTRY_JWK_URL"
+          - name: "GATEWAY_JWK_URL"
             value: "http://10.0.2.199:8000/v0.5/certs"
-          - name: "TOKEN_EXPIRY"
-            value: "10"
-          # userservice
-          - name: "USER_SERVICE_URL"
-            value: "http://20.40.3.253:7000"
+          # locked-user-service
+          - name: "MAXIMUM_INVALID_ATTEMPTS"
+            value: "5"
+          - name: "COOL_OF_PERIOD"
+            value: "8"
           # otpservice
           - name: "OTP_SERVICE_URL"
-            value: "http://10.0.2.201:80"
+            value: "httP://10.0.2.201:80"
           - name: "OTP_EXPIRY_IN_MINUTES"
             value: "5"
           # jwt
-          #          - name: ""
-          # value: ""
+          - name: "JWT_SECRET"
+            value: "secret_salt"
           # authorization
           - name: "AUTHORIZATION_HEADER"
             value: "Authorization"
@@ -102,17 +100,12 @@ spec:
             value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
           - name: "POSTGRES_PORT"
             value: "5432"
-          - name: "CONSENT_MANAGER_DB_NAME"
-            value: "consent_manager"
+          - name: "USER_DB_NAME"
+            value: "user-service"
           - name: "POSTGRES_USER"
             value: "infysurveydev@infy-survey-app"
           - name: "POSTGRES_PASSWORD"
             value: "infy@123_"
-          # linkservice
-          - name: "LINK_SERVICE_URL"
-            value: ""
-          - name: "LINK_TRANSACTION_TIMEOUT"
-            value: "5000"
           # Valid values are guava(for local), redis
           - name: "CACHE_METHOD"
             value: "guava"
@@ -136,28 +129,13 @@ spec:
             value: "10"
           - name: "LISTENERS_RETRY_INTERVAL"
             value: "1000"
-          # nhsproperties
-          - name: "NHS_HIU_ID"
-            value: "12342345"
-          # linktokencache
-          - name: "LINK_TOKEN_CACHE_EXPIRY"
-            value: "1440"
-          # RabbitMQ
-          - name: "RABBITMQ_HOST"
-            value: "10.0.2.9"
-          - name: "RABBITMQ_PORT"
-            value: "5672"
-          - name: "RABBITMQ_USERNAME"
-            value: "guest"
-          - name: "RABBITMQ_PASSWORD"
-            value: "guest"
           # keystore
           - name: "KEYSTORE_PATH"
-            value: "/consent-manager-local-keystore.p12"
+            value: "/user-local-keystore.p12"
           - name: "KEYSTORE_PASSWORD"
             value: "password"
-          - name: "SIGN_ARTEFACT_KEYPAIR_ALIAS"
-            value: "test-sign-artefact"
+          - name: "KEY_STORE_TYPE"
+            value: "PKCS12"
           - name: "PIN_VERIFICATION_KEYPAIR_ALIAS"
             value: "test-pin-verification"
           # Web Client
@@ -170,6 +148,6 @@ spec:
             value: "10"
           - name: "HTTP_CONNECTION_MAX_IDLETIME"
             value: "5"
-
+                      
           ports:
-            - containerPort: 9000
+            - containerPort: 7000
