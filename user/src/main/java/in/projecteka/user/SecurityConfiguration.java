@@ -83,6 +83,7 @@ public class SecurityConfiguration {
             ServerHttpSecurity httpSecurity,
             ReactiveAuthenticationManager authenticationManager,
             ServerSecurityContextRepository securityContextRepository) {
+        httpSecurity.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
         httpSecurity.authorizeExchange().pathMatchers(ALLOWED_LIST_URLS).permitAll()
                 .and().cors().configurationSource(corsConfigurationSource());
         httpSecurity.httpBasic().disable().formLogin().disable().csrf().disable().logout().disable();
