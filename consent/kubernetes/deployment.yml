@@ -38,7 +38,7 @@ spec:
           - name: "MAX_PAGE_SIZE"
             value: "100"
           - name: "CONSENT_SERVICE_URL"
-            value: ""
+            value: "http://20.40.4.111:9000"
           - name: "CONSENT_REQUEST_EXPIRY"
             value: "60"
           - name: "CONSENT_SERVICE_NAME"
@@ -99,7 +99,7 @@ spec:
             value: "http://20.40.6.45:8080/auth/realms/consent-manager"
           # Database
           - name: "POSTGRES_HOST"
-            value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
+            value: "infy-survey-app.postgres.database.azure.com"
           - name: "POSTGRES_PORT"
             value: "5432"
           - name: "CONSENT_MANAGER_DB_NAME"
@@ -110,7 +110,7 @@ spec:
             value: "infy@123_"
           # linkservice
           - name: "LINK_SERVICE_URL"
-            value: ""
+            value: "http://20.40.4.111:9000"
           - name: "LINK_TRANSACTION_TIMEOUT"
             value: "5000"
           # Valid values are guava(for local), redis

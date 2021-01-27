@@ -71,7 +71,7 @@ spec:
             value: "8"
           # otpservice
           - name: "OTP_SERVICE_URL"
-            value: "httP://10.0.2.201:80"
+            value: "http://10.0.2.201:80"
           - name: "OTP_EXPIRY_IN_MINUTES"
             value: "5"
           # jwt
@@ -97,11 +97,11 @@ spec:
             value: "http://20.40.6.45:8080/auth/realms/consent-manager"
           # Database
           - name: "POSTGRES_HOST"
-            value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
+            value: "infy-survey-app.postgres.database.azure.com"
           - name: "POSTGRES_PORT"
             value: "5432"
           - name: "USER_DB_NAME"
-            value: "user-service"
+            value: "user_service"
           - name: "POSTGRES_USER"
             value: "infysurveydev@infy-survey-app"
           - name: "POSTGRES_PASSWORD"

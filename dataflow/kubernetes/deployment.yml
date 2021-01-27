@@ -48,11 +48,11 @@ spec:
             value: "http://20.40.4.111:9000"
           # Database
           - name: "POSTGRES_HOST"
-            value: "jdbc:postgresql://infy-survey-app.postgres.database.azure.com"
+            value: "infy-survey-app.postgres.database.azure.com"
           - name: "POSTGRES_PORT"
             value: "5432"
           - name: "CONSENT_MANAGER_DB_NAME"
-            value: "consent_manager"
+            value: "dataflow_service"
           - name: "POSTGRES_USER"
             value: "infysurveydev@infy-survey-app"
           - name: "POSTGRES_PASSWORD"
