@@ -25,24 +25,18 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static in.projecteka.library.clients.model.ClientError.unAuthorized;
-import static in.projecteka.library.common.Constants.PATH_HEARTBEAT;
-import static in.projecteka.library.common.Constants.PATH_READINESS;
-import static in.projecteka.library.common.Constants.SCOPE_CHANGE_PIN;
+import static in.projecteka.library.common.Constants.*;
 import static in.projecteka.library.common.Role.GATEWAY;
-import static in.projecteka.user.Constants.APP_PATH_CREATE_USER;
-import static in.projecteka.user.Constants.APP_PATH_RESET_PASSWORD;
-import static in.projecteka.user.Constants.APP_PATH_RESET_PIN;
-import static in.projecteka.user.Constants.BASE_PATH_PATIENTS_APIS;
-import static in.projecteka.user.Constants.PATH_FIND_PATIENT;
+import static in.projecteka.user.Constants.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -89,7 +83,8 @@ public class SecurityConfiguration {
             ServerHttpSecurity httpSecurity,
             ReactiveAuthenticationManager authenticationManager,
             ServerSecurityContextRepository securityContextRepository) {
-        httpSecurity.authorizeExchange().pathMatchers(ALLOWED_LIST_URLS).permitAll();
+        httpSecurity.authorizeExchange().pathMatchers(ALLOWED_LIST_URLS).permitAll()
+                .and().cors().configurationSource(corsConfigurationSource());
         httpSecurity.httpBasic().disable().formLogin().disable().csrf().disable().logout().disable();
         httpSecurity
                 .authorizeExchange()
@@ -100,6 +95,17 @@ public class SecurityConfiguration {
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.applyPermitDefaultValues();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
