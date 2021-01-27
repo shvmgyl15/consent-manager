@@ -6,3 +6,4 @@ services:
     - "8081:8080"
     volumes:
     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
