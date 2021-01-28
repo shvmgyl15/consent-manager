@@ -71,7 +71,7 @@ spec:
             value: "8"
           # otpservice
           - name: "OTP_SERVICE_URL"
-            value: "httP://a70651f25675c49e2b5a971f145db1df-2015175170.us-east-2.elb.amazonaws.com:80"
+            value: "http://a70651f25675c49e2b5a971f145db1df-2015175170.us-east-2.elb.amazonaws.com:80"
           - name: "OTP_EXPIRY_IN_MINUTES"
             value: "5"
           # jwt

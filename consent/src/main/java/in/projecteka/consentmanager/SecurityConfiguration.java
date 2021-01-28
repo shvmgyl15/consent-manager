@@ -26,33 +26,20 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static in.projecteka.consentmanager.Constants.PATH_HEARTBEAT;
-import static in.projecteka.consentmanager.consent.Constants.CONSENT_REQUESTS_STATUS;
-import static in.projecteka.consentmanager.consent.Constants.GET_CONSENT_CERT;
-import static in.projecteka.consentmanager.consent.Constants.PATH_CONSENTS_FETCH;
-import static in.projecteka.consentmanager.consent.Constants.PATH_CONSENT_REQUESTS_INIT;
-import static in.projecteka.consentmanager.consent.Constants.PATH_HIP_CONSENT_ON_NOTIFY;
-import static in.projecteka.consentmanager.consent.Constants.PATH_HIU_CONSENT_ON_NOTIFY;
-import static in.projecteka.consentmanager.link.Constants.PATH_CARE_CONTEXTS_ON_DISCOVER;
-import static in.projecteka.consentmanager.link.Constants.PATH_HIP_ADD_CONTEXTS;
-import static in.projecteka.consentmanager.link.Constants.PATH_LINK_ON_CONFIRM;
-import static in.projecteka.consentmanager.link.Constants.PATH_LINK_ON_INIT;
-import static in.projecteka.consentmanager.userauth.Constants.PATH_USER_AUTH_CONFIRM;
-import static in.projecteka.consentmanager.userauth.Constants.PATH_USER_AUTH_INIT;
-import static in.projecteka.consentmanager.userauth.Constants.PATH_USER_FETCH_AUTH_MODES;
+import static in.projecteka.consentmanager.consent.Constants.*;
+import static in.projecteka.consentmanager.link.Constants.*;
+import static in.projecteka.consentmanager.userauth.Constants.*;
 import static in.projecteka.library.clients.model.ClientError.unAuthorized;
-import static in.projecteka.library.common.Constants.PATH_READINESS;
-import static in.projecteka.library.common.Constants.SCOPE_CHANGE_PIN;
-import static in.projecteka.library.common.Constants.SCOPE_CONSENT_APPROVE;
-import static in.projecteka.library.common.Constants.SCOPE_CONSENT_REVOKE;
+import static in.projecteka.library.common.Constants.*;
 import static in.projecteka.library.common.Role.GATEWAY;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
@@ -142,7 +129,9 @@ public class SecurityConfiguration {
             ServerHttpSecurity httpSecurity,
             ReactiveAuthenticationManager authenticationManager,
             ServerSecurityContextRepository securityContextRepository) {
-        httpSecurity.authorizeExchange().pathMatchers(ALLOWED_LIST_URLS).permitAll();
+        httpSecurity.authorizeExchange().pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+        httpSecurity.authorizeExchange().pathMatchers(ALLOWED_LIST_URLS).permitAll()
+                .and().cors().configurationSource(corsConfigurationSource());
         httpSecurity.httpBasic().disable().formLogin().disable().csrf().disable().logout().disable();
         httpSecurity
                 .authorizeExchange()
@@ -153,6 +142,17 @@ public class SecurityConfiguration {
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.applyPermitDefaultValues();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

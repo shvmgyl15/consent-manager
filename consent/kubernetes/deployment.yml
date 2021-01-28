@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: consent
-          image: 413379950444.dkr.ecr.us-east-2.amazonaws.com/consent-manager/consent:latest 
+          image: 413379950444.dkr.ecr.us-east-2.amazonaws.com/consent-manager/consent:latest
           env:
           - name: "SERVER_PORT"
             value: "9000"
@@ -38,7 +38,7 @@ spec:
           - name: "MAX_PAGE_SIZE"
             value: "100"
           - name: "CONSENT_SERVICE_URL"
-            value: ""
+            value: "http://a694c24894bb445789feedb879ecaaf7-325014892.us-east-2.elb.amazonaws.com:9000"
           - name: "CONSENT_REQUEST_EXPIRY"
             value: "60"
           - name: "CONSENT_SERVICE_NAME"
@@ -110,7 +110,7 @@ spec:
             value: "8U-BWr9Gz!276zLe"
           # linkservice
           - name: "LINK_SERVICE_URL"
-            value: ""
+            value: "http://a694c24894bb445789feedb879ecaaf7-325014892.us-east-2.elb.amazonaws.com:9000"
           - name: "LINK_TRANSACTION_TIMEOUT"
             value: "5000"
           # Valid values are guava(for local), redis
