@@ -65,7 +65,7 @@ spec:
           - name: "KEY_CLOAK_CONSENT_CLIENT_SECRET"
             value: "e18bcd6c-178f-4335-814e-ce0231f83b1d"
           - name: "KEY_CLOAK_JWK_URL"
-            value: "https://13.59.3.205:8443/auth/realms/consent-manager/protocol/openid-connect/certs"
+            value: "https://13.59.3.205:8443/auth/realms/vaccination/protocol/openid-connect/certs"
           # Valid values are guava(for local), redis
           - name: "CACHE_METHOD"
             value: "guava"
