@@ -292,16 +292,18 @@ public class UserService {
 
     public Mono<Void> create(CoreSignUpRequest coreSignUpRequest, String sessionId) {
         UserCredential credential = new UserCredential(coreSignUpRequest.getPassword());
-        KeycloakUser keycloakUser = new KeycloakUser(
-                coreSignUpRequest.getName().createFullName(),
-                coreSignUpRequest.getUsername(),
-                Collections.singletonList(credential),
-                Boolean.TRUE.toString());
+//        KeycloakUser keycloakUser = new KeycloakUser(
+//                coreSignUpRequest.getName().createFullName(),
+//                coreSignUpRequest.getUsername(),
+//                Collections.singletonList(credential),
+//                Boolean.TRUE.toString());
 
         return signupService.getMobileNumber(sessionId)
                 .switchIfEmpty(Mono.error(new InvalidRequestException("mobile number not verified")))
                 .flatMap(mobileNumber -> userExistsWith(coreSignUpRequest.getUsername())
-                        .switchIfEmpty(Mono.defer(() -> createUserWith(mobileNumber, coreSignUpRequest, keycloakUser)))
+                        .switchIfEmpty(Mono.defer(() -> createUserWith(mobileNumber, coreSignUpRequest
+//                                , keycloakUser
+                        )))
                         .then());
     }
 
@@ -358,17 +360,18 @@ public class UserService {
     }
 
     private Mono<Void> createUserWith(String mobileNumber,
-                                      CoreSignUpRequest coreSignUpRequest,
-                                      KeycloakUser keycloakUser) {
+                                      CoreSignUpRequest coreSignUpRequest
+//                                    , KeycloakUser keycloakUser
+    ) {
         User user = User.from(coreSignUpRequest, mobileNumber);
         return userRepository.save(user)
-                .then(tokenService.tokenForAdmin()
-                        .flatMap(accessToken -> identityServiceClient.createUser(accessToken, keycloakUser))
-                        .then())
-                .onErrorResume(ClientError.class, error -> {
-                    logger.error(error.getMessage(), error);
-                    return userRepository.delete(user.getIdentifier()).then();
-                })
+//                .then(tokenService.tokenForAdmin()
+//                        .flatMap(accessToken -> identityServiceClient.createUser(accessToken, keycloakUser))
+//                        .then())
+//                .onErrorResume(ClientError.class, error -> {
+//                    logger.error(error.getMessage(), error);
+//                    return userRepository.delete(user.getIdentifier()).then();
+//                })
                 .then();
     }
 

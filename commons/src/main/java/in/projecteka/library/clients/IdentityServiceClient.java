@@ -1,12 +1,8 @@
 package in.projecteka.library.clients;
 
-import in.projecteka.library.clients.model.ClientError;
-import in.projecteka.library.clients.model.KeyCloakUserCredentialRepresentation;
-import in.projecteka.library.clients.model.KeyCloakUserPasswordChangeRequest;
-import in.projecteka.library.clients.model.KeyCloakUserRepresentation;
-import in.projecteka.library.clients.model.KeycloakUser;
-import in.projecteka.library.clients.model.Session;
+import in.projecteka.library.clients.model.*;
 import in.projecteka.library.common.KeyCloakError;
+import in.projecteka.library.common.OpUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,11 +13,8 @@ import java.util.function.Function;
 import static java.lang.String.format;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.web.reactive.function.BodyInserters.fromFormData;
-import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
 public class IdentityServiceClient {
@@ -37,7 +30,7 @@ public class IdentityServiceClient {
         return webClient
                 .post()
                 .uri(uriBuilder ->
-                        uriBuilder.path("/admin/realms/consent-manager/users").build())
+                        uriBuilder.path("/admin/realms/" + OpUtil.REALM_CONSENT_MANAGER + "/users").build())
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .header(AUTHORIZATION, accessToken)
                 .accept(APPLICATION_JSON)
@@ -52,7 +45,7 @@ public class IdentityServiceClient {
         return webClient
                 .post()
                 .uri(uriBuilder ->
-                        uriBuilder.path("/realms/consent-manager/protocol/openid-connect/token").build())
+                        uriBuilder.path("/realms/" + OpUtil.REALM_CONSENT_MANAGER + "/protocol/openid-connect/token").build())
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .accept(APPLICATION_JSON)
                 .body(fromFormData(formData))
@@ -78,7 +71,7 @@ public class IdentityServiceClient {
     }
 
     public Mono<KeyCloakUserRepresentation> getUser(String userName, String accessToken) {
-        String uri = format("/admin/realms/consent-manager/users?username=%s", userName);
+        String uri = format("/admin/realms/" + OpUtil.REALM_CONSENT_MANAGER + "/users?username=%s", userName);
         return webClient
                 .get()
                 .uri(uri)
@@ -92,7 +85,7 @@ public class IdentityServiceClient {
     }
 
     public Mono<KeyCloakUserCredentialRepresentation> getCredentials(String userId, String accessToken) {
-        String uri = format("/admin/realms/consent-manager/users/%s/credentials", userId);
+        String uri = format("/admin/realms/" + OpUtil.REALM_CONSENT_MANAGER + "/users/%s/credentials", userId);
         return webClient
                 .get()
                 .uri(uri)
@@ -109,7 +102,7 @@ public class IdentityServiceClient {
         return webClient
                 .post()
                 .uri(uriBuilder ->
-                        uriBuilder.path("/realms/consent-manager/protocol/openid-connect/logout").build())
+                        uriBuilder.path("/realms/" + OpUtil.REALM_CONSENT_MANAGER + "/protocol/openid-connect/logout").build())
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .body(fromFormData(formData))
                 .retrieve()
@@ -118,7 +111,7 @@ public class IdentityServiceClient {
     }
 
     public Mono<Void> updateUser(String accessToken, String keyCloakUserId, String userPassword) {
-        String uri = format("/admin/realms/consent-manager/users/%s/reset-password", keyCloakUserId);
+        String uri = format("/admin/realms/" + OpUtil.REALM_CONSENT_MANAGER + "/users/%s/reset-password", keyCloakUserId);
         KeyCloakUserPasswordChangeRequest keyCloakUserPasswordChangeRequest = KeyCloakUserPasswordChangeRequest
                 .builder()
                 .value(userPassword)
