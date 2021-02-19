@@ -98,7 +98,7 @@ public class ConsentConfiguration {
     }
 
     @Bean
-    public HipConsentNotificationConsumer hiuNotificationListener(
+    public HipConsentNotificationConsumer hipConsentNotificationConsumer(
             ConsentArtefactNotifier consentArtefactNotifier,
             ConsentArtefactRepository consentArtefactRepository,
             CacheAdapter<String, String> hipConsentArtefactStatus) {

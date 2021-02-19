@@ -28,7 +28,6 @@ import static in.projecteka.consentmanager.consent.model.ConsentStatus.*;
 import static in.projecteka.consentmanager.consent.model.HipConsentArtefactNotificationStatus.NOTIFYING;
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
-@Service
 @AllArgsConstructor
 public class HipConsentNotificationConsumer {
     private static final Logger logger = LoggerFactory.getLogger(HipConsentNotificationConsumer.class);
