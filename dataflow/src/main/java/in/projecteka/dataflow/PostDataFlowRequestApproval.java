@@ -9,12 +9,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
 @AllArgsConstructor
 @Slf4j
+@Service
 public class PostDataFlowRequestApproval {
     private final IProducerStream iProducerStream;
 
