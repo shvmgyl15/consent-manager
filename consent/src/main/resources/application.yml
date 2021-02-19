@@ -73,17 +73,15 @@ consentmanager:
   linktokencache:
     expiry: ${LINK_TOKEN_CACHE_EXPIRY:1440}
 spring:
-  json:
-    trusted:
-      packages: in.projecteka.library.common.TraceableMessage
   cloud:
     stream:
       default:
         producer:
-          useNativeEncoding: true
+          useNativeEncoding: false
+        consumer:
+          useNativeDecoding: false
       kafka:
         binder:
-          headerMapperBeanName: in.projecteka.library.common.TraceableMessage
           brokers: ${KAFKA_URL:http://13.71.113.65:9092}
           producer-properties:
             key.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
