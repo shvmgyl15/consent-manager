@@ -115,6 +115,7 @@ public class SecurityConfiguration {
                                                                    "/otpsession/verify",
                                                                    "/otpsession/permit",
                                                                    "/sessions",
+                                                                   "/test/producer",
                                                                    PATH_HEARTBEAT,
                                                                    PATH_READINESS,
                                                                    "/**.html",
