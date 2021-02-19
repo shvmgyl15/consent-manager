@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -28,7 +27,6 @@ import static in.projecteka.consentmanager.consent.model.ConsentStatus.*;
 import static in.projecteka.consentmanager.consent.model.HipConsentArtefactNotificationStatus.NOTIFYING;
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
-@Service
 @AllArgsConstructor
 public class HipConsentNotificationConsumer {
     private static final Logger logger = LoggerFactory.getLogger(HipConsentNotificationConsumer.class);

@@ -3,6 +3,7 @@ package in.projecteka.consentmanager.consent;
 import in.projecteka.consentmanager.clients.ConsentArtefactNotifier;
 import in.projecteka.consentmanager.clients.ConsentManagerClient;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
+import in.projecteka.consentmanager.kafkaStreams.consumer.HipConsentNotificationConsumer;
 import in.projecteka.consentmanager.kafkaStreams.producer.ConsentNotificationProducer;
 import in.projecteka.consentmanager.properties.GatewayServiceProperties;
 import in.projecteka.consentmanager.properties.KeyPairConfig;
@@ -94,6 +95,17 @@ public class ConsentConfiguration {
             ConsentArtefactRepository consentArtefactRepository,
             ConsentNotificationProducer consentNotificationProducer) {
         return new ConsentScheduler(consentArtefactRepository, consentNotificationProducer);
+    }
+
+    @Bean
+    public HipConsentNotificationConsumer hiuNotificationListener(
+            ConsentArtefactNotifier consentArtefactNotifier,
+            ConsentArtefactRepository consentArtefactRepository,
+            CacheAdapter<String, String> hipConsentArtefactStatus) {
+        return new HipConsentNotificationConsumer(
+                consentArtefactNotifier,
+                consentArtefactRepository,
+                hipConsentArtefactStatus);
     }
 
     @Bean
