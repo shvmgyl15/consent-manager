@@ -1,5 +1,6 @@
 package in.projecteka.dataflow.kafkaStream.producer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.projecteka.dataflow.kafkaStream.stream.IProducerStream;
 import in.projecteka.library.common.TraceableMessage;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageProducer {
     private final Logger log = LoggerFactory.getLogger(MessageProducer.class);
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private IProducerStream iProducerStream;
@@ -20,7 +22,7 @@ public class MessageProducer {
         log.info("In produce message: {}", message);
         try {
             MessageChannel messageChannel = iProducerStream.produce();
-            messageChannel.send(MessageBuilder.withPayload(message).build());
+            messageChannel.send(MessageBuilder.withPayload(mapper.writeValueAsString(message)).build());
         } catch (Exception e) {
             e.printStackTrace();
         }

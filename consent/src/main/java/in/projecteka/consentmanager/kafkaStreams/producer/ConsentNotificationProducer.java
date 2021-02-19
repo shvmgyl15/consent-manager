@@ -1,5 +1,7 @@
 package in.projecteka.consentmanager.kafkaStreams.producer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.projecteka.consentmanager.consent.model.ConsentArtefactsMessage;
 import in.projecteka.consentmanager.consent.model.ConsentRequest;
 import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
@@ -19,6 +21,7 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @Service
 public class ConsentNotificationProducer {
     private static final Logger logger = LoggerFactory.getLogger(ConsentNotificationProducer.class);
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     IConsentNotificationStream iConsentNotificationStream;
@@ -76,10 +79,11 @@ public class ConsentNotificationProducer {
         });
     }
 
-    private TraceableMessage getMessage(Object message) {
-        return TraceableMessage.builder()
+    private String getMessage(Object message) throws JsonProcessingException {
+        TraceableMessage traceableMessage = TraceableMessage.builder()
                 .correlationId(MDC.get(CORRELATION_ID))
                 .message(message)
                 .build();
+        return mapper.writeValueAsString(traceableMessage);
     }
 }

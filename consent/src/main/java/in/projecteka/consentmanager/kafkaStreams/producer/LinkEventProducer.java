@@ -1,5 +1,6 @@
 package in.projecteka.consentmanager.kafkaStreams.producer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.projecteka.consentmanager.kafkaStreams.stream.IHipLinkStream;
 import in.projecteka.consentmanager.link.link.model.CCLinkEvent;
 import in.projecteka.library.common.TraceableMessage;
@@ -17,6 +18,7 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @Service
 public class LinkEventProducer {
     private static final Logger logger = LoggerFactory.getLogger(LinkEventProducer.class);
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     IHipLinkStream iHipLinkStream;
@@ -40,7 +42,7 @@ public class LinkEventProducer {
                 message.getHealthNumber(), message.getHipId());
         try {
             MessageChannel messageChannel = iHipLinkStream.send();
-            messageChannel.send(MessageBuilder.withPayload(traceableMessage).build());
+            messageChannel.send(MessageBuilder.withPayload(mapper.writeValueAsString(traceableMessage)).build());
         } catch (Exception e) {
             e.printStackTrace();
         }
