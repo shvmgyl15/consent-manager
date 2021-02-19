@@ -1,6 +1,6 @@
 package in.projecteka.consentmanager.consent;
 
-enum ConsentNotificationReceiver {
+public enum ConsentNotificationReceiver {
     HIU,
     HIP
 }

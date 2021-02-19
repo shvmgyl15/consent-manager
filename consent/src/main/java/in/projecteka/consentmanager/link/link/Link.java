@@ -2,30 +2,14 @@ package in.projecteka.consentmanager.link.link;
 
 import in.projecteka.consentmanager.clients.LinkServiceClient;
 import in.projecteka.consentmanager.clients.model.Patient;
-import in.projecteka.consentmanager.clients.model.PatientLinkReferenceResponse;
-import in.projecteka.consentmanager.clients.model.PatientLinkReferenceResult;
-import in.projecteka.consentmanager.clients.model.PatientLinkRequest;
-import in.projecteka.consentmanager.clients.model.PatientLinkResponse;
-import in.projecteka.consentmanager.clients.model.PatientRepresentation;
+import in.projecteka.consentmanager.clients.model.*;
+import in.projecteka.consentmanager.kafkaStreams.producer.LinkEventProducer;
 import in.projecteka.consentmanager.link.Constants;
-import in.projecteka.consentmanager.link.LinkEventPublisher;
-import in.projecteka.consentmanager.link.link.model.Acknowledgement;
-import in.projecteka.consentmanager.link.link.model.AuthzHipAction;
-import in.projecteka.consentmanager.link.link.model.LinkConfirmationRequest;
-import in.projecteka.consentmanager.link.link.model.LinkConfirmationResult;
-import in.projecteka.consentmanager.link.link.model.LinkRequest;
-import in.projecteka.consentmanager.link.link.model.LinkResponse;
-import in.projecteka.consentmanager.link.link.model.CCLinkEvent;
-import in.projecteka.consentmanager.link.link.model.PatientCareContext;
 import in.projecteka.consentmanager.link.link.model.PatientLinkReferenceRequest;
-import in.projecteka.consentmanager.link.link.model.PatientLinksResponse;
-import in.projecteka.consentmanager.link.link.model.TokenConfirmation;
+import in.projecteka.consentmanager.link.link.model.*;
 import in.projecteka.consentmanager.properties.LinkServiceProperties;
-import in.projecteka.library.clients.model.ClientError;
 import in.projecteka.library.clients.model.Error;
-import in.projecteka.library.clients.model.ErrorRepresentation;
-import in.projecteka.library.clients.model.GatewayResponse;
-import in.projecteka.library.clients.model.RespError;
+import in.projecteka.library.clients.model.*;
 import in.projecteka.library.common.DelayTimeoutException;
 import in.projecteka.library.common.ServiceAuthentication;
 import in.projecteka.library.common.cache.CacheAdapter;
@@ -55,9 +39,7 @@ import static in.projecteka.library.common.CustomScheduler.scheduleThis;
 import static in.projecteka.library.common.Serializer.from;
 import static in.projecteka.library.common.Serializer.tryTo;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static reactor.core.publisher.Mono.defer;
-import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.*;
 
 @AllArgsConstructor
 public class Link {
@@ -69,7 +51,7 @@ public class Link {
     private final LinkServiceProperties serviceProperties;
     private final CacheAdapter<String, String> linkResults;
     private final LinkTokenVerifier linkTokenVerifier;
-    private final LinkEventPublisher linkEventPublisher;
+    private final LinkEventProducer linkEventProducer;
 
     public Mono<PatientLinkReferenceResponse> patientCareContexts(
             String patientId,
@@ -275,6 +257,6 @@ public class Link {
                 .timestamp(LocalDateTime.now())
                 .careContexts(patientCareContexts)
                 .build();
-        return linkEventPublisher.publish(linkEvent);
+        return linkEventProducer.publish(linkEvent);
     }
 }

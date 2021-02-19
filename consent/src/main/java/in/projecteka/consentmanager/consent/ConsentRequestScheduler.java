@@ -4,6 +4,7 @@ import in.projecteka.consentmanager.consent.model.ConsentArtefactsMessage;
 import in.projecteka.consentmanager.consent.model.ConsentRequestDetail;
 import in.projecteka.consentmanager.consent.model.ConsentStatus;
 import in.projecteka.consentmanager.consent.model.HIPConsentArtefactRepresentation;
+import in.projecteka.consentmanager.kafkaStreams.producer.ConsentNotificationProducer;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class ConsentRequestScheduler {
 
     private final ConsentRequestRepository consentRequestRepository;
     private final ConsentServiceProperties consentServiceProperties;
-    private final ConsentNotificationPublisher consentNotificationPublisher;
+    private final ConsentNotificationProducer consentNotificationProducer;
 
     @Scheduled(cron = "${consentmanager.scheduler.consentRequestExpiryCronExpr}")
     @Async
@@ -70,7 +71,7 @@ public class ConsentRequestScheduler {
                 .consentArtefacts(consents)
                 .hiuId(hiuId)
                 .build();
-        return consentNotificationPublisher.publish(message);
+        return consentNotificationProducer.publish(message);
     }
 
     private <T> T blockPublisher(Mono<T> publisher) {

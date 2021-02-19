@@ -1,75 +1,65 @@
-package in.projecteka.consentmanager.consent;
+package in.projecteka.consentmanager.kafkaStreams.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import in.projecteka.consentmanager.MessageListenerContainerFactory;
 import in.projecteka.consentmanager.clients.ConsentArtefactNotifier;
+import in.projecteka.consentmanager.consent.ConsentArtefactRepository;
+import in.projecteka.consentmanager.consent.ConsentNotificationReceiver;
 import in.projecteka.consentmanager.consent.model.ConsentNotificationStatus;
 import in.projecteka.consentmanager.consent.model.HIPConsentArtefactRepresentation;
 import in.projecteka.consentmanager.consent.model.request.HIPNotificationRequest;
+import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
 import in.projecteka.library.common.TraceableMessage;
 import in.projecteka.library.common.cache.CacheAdapter;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.amqp.AmqpRejectAndDontRequeueException;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
 
-import static in.projecteka.consentmanager.Constants.HIP_CONSENT_NOTIFICATION_QUEUE;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.EXPIRED;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.GRANTED;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.REVOKED;
+import static in.projecteka.consentmanager.consent.model.ConsentStatus.*;
 import static in.projecteka.consentmanager.consent.model.HipConsentArtefactNotificationStatus.NOTIFYING;
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
+@Service
 @AllArgsConstructor
-public class HipConsentNotificationListener {
-    private static final Logger logger = LoggerFactory.getLogger(HipConsentNotificationListener.class);
-    private final MessageListenerContainerFactory messageListenerContainerFactory;
-    private final Jackson2JsonMessageConverter converter;
+public class HipConsentNotificationConsumer {
+    private static final Logger logger = LoggerFactory.getLogger(HipConsentNotificationConsumer.class);
     private final ConsentArtefactNotifier consentArtefactNotifier;
     private final ConsentArtefactRepository consentArtefactRepository;
     private final CacheAdapter<String, String> cache;
 
-    @PostConstruct
-    public void subscribe() {
-        var mlc = messageListenerContainerFactory.createMessageListenerContainer(HIP_CONSENT_NOTIFICATION_QUEUE);
+    @StreamListener(IConsentNotificationStream.INPUT_HIP_CONSENT_NOTIFICATION_QUEUE)
+    public void subscribe(String message) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
+            mapper.registerModule(new JavaTimeModule());
+            HIPConsentArtefactRepresentation consentArtefact = mapper.convertValue(traceableMessage.getMessage()
+                    , HIPConsentArtefactRepresentation.class);
+            MDC.put(CORRELATION_ID, traceableMessage.getCorrelationId());
+            logger.info("Received notify consent to hip for consent artefact: {}",
+                    consentArtefact.getConsentId());
 
-        MessageListener messageListener = message -> {
-            try {
-                TraceableMessage traceableMessage = (TraceableMessage) converter.fromMessage(message);
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.registerModule(new JavaTimeModule());
-                HIPConsentArtefactRepresentation consentArtefact = mapper.convertValue(traceableMessage.getMessage()
-                        , HIPConsentArtefactRepresentation.class);
-                MDC.put(CORRELATION_ID, traceableMessage.getCorrelationId());
-                logger.info("Received notify consent to hip for consent artefact: {}",
-                        consentArtefact.getConsentId());
-
-                sendConsentArtefactToHIP(consentArtefact)
-                        .subscriberContext(ctx -> {
-                            Optional<String> correlationId = Optional.ofNullable(MDC.get(CORRELATION_ID));
-                            return correlationId.map(id -> ctx.put(CORRELATION_ID, id))
-                                    .orElseGet(() -> ctx.put(CORRELATION_ID, UUID.randomUUID().toString()));
-                        })
-                        .block();
-                MDC.clear();
-            } catch (Exception e) {
-                throw new AmqpRejectAndDontRequeueException(e.getMessage(), e);
-            }
-        };
-        mlc.setupMessageListener(messageListener);
-
-        mlc.start();
+            sendConsentArtefactToHIP(consentArtefact)
+                    .subscriberContext(ctx -> {
+                        Optional<String> correlationId = Optional.ofNullable(MDC.get(CORRELATION_ID));
+                        return correlationId.map(id -> ctx.put(CORRELATION_ID, id))
+                                .orElseGet(() -> ctx.put(CORRELATION_ID, UUID.randomUUID().toString()));
+                    })
+                    .block();
+            MDC.clear();
+        } catch (Exception e) {
+            logger.debug("Exception in HIP Consent Notification Consumer");
+            e.printStackTrace();
+        }
     }
 
 

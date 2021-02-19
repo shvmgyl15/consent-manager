@@ -27,9 +27,14 @@ bootJar {
 
 bootRunLocal.finalizedBy bootRun
 
+ext {
+    set('springCloudVersion', "Hoxton.SR10")
+}
+
 dependencies {
+    implementation 'org.springframework.cloud:spring-cloud-stream'
+    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'javax.validation:validation-api:2.0.1.Final'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
@@ -55,6 +60,12 @@ dependencies {
     testImplementation 'org.apache.commons:commons-lang3:3.11'
 
     implementation project(":commons")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 jacocoTestReport {

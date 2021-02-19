@@ -2,43 +2,13 @@ package in.projecteka.consentmanager.consent;
 
 import in.projecteka.consentmanager.clients.ConsentManagerClient;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
-import in.projecteka.consentmanager.consent.model.CMReference;
-import in.projecteka.consentmanager.consent.model.CertDetails;
-import in.projecteka.consentmanager.consent.model.CertResponse;
-import in.projecteka.consentmanager.consent.model.Consent;
-import in.projecteka.consentmanager.consent.model.ConsentArtefact;
-import in.projecteka.consentmanager.consent.model.ConsentArtefactResult;
-import in.projecteka.consentmanager.consent.model.ConsentArtefactsMessage;
-import in.projecteka.consentmanager.consent.model.ConsentDetail;
-import in.projecteka.consentmanager.consent.model.ConsentNotificationStatus;
-import in.projecteka.consentmanager.consent.model.ConsentPurpose;
-import in.projecteka.consentmanager.consent.model.ConsentRepresentation;
-import in.projecteka.consentmanager.consent.model.ConsentRequest;
-import in.projecteka.consentmanager.consent.model.ConsentRequestDetail;
-import in.projecteka.consentmanager.consent.model.ConsentStatus;
-import in.projecteka.consentmanager.consent.model.ConsentStatusCallerDetail;
-import in.projecteka.consentmanager.consent.model.ConsentStatusDetail;
-import in.projecteka.consentmanager.consent.model.GrantedContext;
-import in.projecteka.consentmanager.consent.model.HIPConsentArtefact;
-import in.projecteka.consentmanager.consent.model.HIPConsentArtefactRepresentation;
-import in.projecteka.consentmanager.consent.model.HIType;
-import in.projecteka.consentmanager.consent.model.HIUReference;
-import in.projecteka.consentmanager.consent.model.ListResult;
-import in.projecteka.consentmanager.consent.model.QueryRepresentation;
-import in.projecteka.consentmanager.consent.model.RevokeRequest;
+import in.projecteka.consentmanager.consent.model.*;
 import in.projecteka.consentmanager.consent.model.request.ConsentArtefactReference;
 import in.projecteka.consentmanager.consent.model.request.ConsentRequestStatus;
 import in.projecteka.consentmanager.consent.model.request.GrantedConsent;
 import in.projecteka.consentmanager.consent.model.request.RequestedDetail;
-import in.projecteka.consentmanager.consent.model.response.ConsentApprovalResponse;
-import in.projecteka.consentmanager.consent.model.response.ConsentArtefactLight;
-import in.projecteka.consentmanager.consent.model.response.ConsentArtefactLightRepresentation;
-import in.projecteka.consentmanager.consent.model.response.ConsentArtefactRepresentation;
-import in.projecteka.consentmanager.consent.model.response.ConsentReference;
-import in.projecteka.consentmanager.consent.model.response.ConsentRequestId;
-import in.projecteka.consentmanager.consent.model.response.ConsentRequestResult;
-import in.projecteka.consentmanager.consent.model.response.ConsentStatusResponse;
-import in.projecteka.consentmanager.consent.model.response.HIPConsentNotificationAcknowledgment;
+import in.projecteka.consentmanager.consent.model.response.*;
+import in.projecteka.consentmanager.kafkaStreams.producer.ConsentNotificationProducer;
 import in.projecteka.library.clients.UserServiceClient;
 import in.projecteka.library.clients.model.ClientError;
 import in.projecteka.library.clients.model.Error;
@@ -62,36 +32,17 @@ import java.security.Signature;
 import java.security.SignedObject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.DENIED;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.EXPIRED;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.GRANTED;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.REQUESTED;
-import static in.projecteka.consentmanager.consent.model.ConsentStatus.REVOKED;
+import static in.projecteka.consentmanager.consent.model.ConsentStatus.*;
 import static in.projecteka.library.clients.model.ClientError.requestAlreadyExists;
-import static in.projecteka.library.clients.model.ErrorCode.CONSENT_REQUEST_NOT_FOUND;
-import static in.projecteka.library.clients.model.ErrorCode.INVALID_HITYPE;
-import static in.projecteka.library.clients.model.ErrorCode.INVALID_PURPOSE;
-import static in.projecteka.library.clients.model.ErrorCode.INVALID_STATE;
-import static in.projecteka.library.clients.model.ErrorCode.UNABLE_TO_PARSE_KEY;
-import static in.projecteka.library.clients.model.ErrorCode.USER_NOT_FOUND;
+import static in.projecteka.library.clients.model.ErrorCode.*;
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 import static java.lang.String.format;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @AllArgsConstructor
 public class ConsentManager {
@@ -103,9 +54,8 @@ public class ConsentManager {
     private final ConsentRequestRepository consentRequestRepository;
     private final ConsentArtefactRepository consentArtefactRepository;
     private final KeyPair keyPair;
-    private final ConsentNotificationPublisher consentNotificationPublisher;
+    private final ConsentNotificationProducer consentNotificationProducer;
     private final CentralRegistry centralRegistry;
-    private final PostConsentRequest postConsentRequest;
     private final PatientServiceClient patientServiceClient;
     private final CMProperties cmProperties;
     private final ConceptValidator conceptValidator;
@@ -126,7 +76,7 @@ public class ConsentManager {
                         .then(validateHiTypes(requestedDetail.getHiTypes()))
                         .then(validateHIPAndHIU(requestedDetail))
                         .then(saveRequest(requestedDetail, requestId))
-                        .then(postConsentRequest.broadcastConsentRequestNotification(ConsentRequest.builder()
+                        .then(consentNotificationProducer.broadcastConsentRequestNotification(ConsentRequest.builder()
                                 .detail(requestedDetail)
                                 .id(requestId)
                                 .build()))
@@ -161,7 +111,7 @@ public class ConsentManager {
     }
 
     private Mono<Void> broadcastConsentRequest(RequestedDetail requestedDetail, UUID requestId) {
-        return postConsentRequest.broadcastConsentRequestNotification(ConsentRequest.builder()
+        return consentNotificationProducer.broadcastConsentRequestNotification(ConsentRequest.builder()
                 .detail(requestedDetail)
                 .id(requestId)
                 .build());
@@ -351,7 +301,7 @@ public class ConsentManager {
                 .consentArtefacts(consents)
                 .hiuId(consentRequest.getId())
                 .build();
-        return consentNotificationPublisher.publish(message);
+        return consentNotificationProducer.publish(message);
     }
 
     private ConsentApprovalResponse consentApprovalResponse(

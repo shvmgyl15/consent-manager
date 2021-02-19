@@ -1,15 +1,18 @@
-package in.projecteka.consentmanager.consent;
+package in.projecteka.consentmanager.kafkaStreams.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import in.projecteka.consentmanager.MessageListenerContainerFactory;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
+import in.projecteka.consentmanager.consent.ConsentManager;
+import in.projecteka.consentmanager.consent.ConsentServiceProperties;
+import in.projecteka.consentmanager.consent.NHSProperties;
 import in.projecteka.consentmanager.consent.model.ConsentRequest;
 import in.projecteka.consentmanager.consent.model.Content;
 import in.projecteka.consentmanager.consent.model.GrantedContext;
 import in.projecteka.consentmanager.consent.model.HIType;
 import in.projecteka.consentmanager.consent.model.request.GrantedConsent;
 import in.projecteka.consentmanager.consent.policies.NhsPolicyCheck;
+import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
 import in.projecteka.library.clients.OtpServiceClient;
 import in.projecteka.library.clients.UserServiceClient;
 import in.projecteka.library.clients.model.Action;
@@ -21,27 +24,19 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.amqp.AmqpRejectAndDontRequeueException;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.cloud.stream.annotation.StreamListener;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static in.projecteka.consentmanager.Constants.CONSENT_REQUEST_QUEUE;
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
 @AllArgsConstructor
-public class ConsentRequestNotificationListener {
-    private static final Logger logger = LoggerFactory.getLogger(ConsentRequestNotificationListener.class);
-    private final MessageListenerContainerFactory messageListenerContainerFactory;
-    private final Jackson2JsonMessageConverter converter;
+public class ConsentRequestNotificationConsumer {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConsentRequestNotificationConsumer.class);
+
     private final OtpServiceClient consentNotificationClient;
     private final UserServiceClient userServiceClient;
     private final ConsentServiceProperties consentServiceProperties;
@@ -49,25 +44,21 @@ public class ConsentRequestNotificationListener {
     private final PatientServiceClient patientServiceClient;
     private final NHSProperties nhsProperties;
 
-    @PostConstruct
-    public void subscribe() {
-        var mlc = messageListenerContainerFactory.createMessageListenerContainer(CONSENT_REQUEST_QUEUE);
-        MessageListener messageListener = message -> {
-            try {
-                TraceableMessage traceableMessage = (TraceableMessage) converter.fromMessage(message);
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.registerModule(new JavaTimeModule());
-                ConsentRequest consentRequest = mapper.convertValue(traceableMessage.getMessage(), ConsentRequest.class);
-                MDC.put(CORRELATION_ID, traceableMessage.getCorrelationId());
-                logger.info("Received message for Request id : {}", consentRequest.getId());
-                processConsentRequest(consentRequest);
-                MDC.clear();
-            } catch (Exception e) {
-                throw new AmqpRejectAndDontRequeueException(e.getMessage(), e);
-            }
-        };
-        mlc.setupMessageListener(messageListener);
-        mlc.start();
+    @StreamListener(IConsentNotificationStream.INPUT_CONSENT_REQUEST_QUEUE)
+    public void subscribe(String message) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
+            mapper.registerModule(new JavaTimeModule());
+            ConsentRequest consentRequest = mapper.convertValue(traceableMessage.getMessage(), ConsentRequest.class);
+            MDC.put(CORRELATION_ID, traceableMessage.getCorrelationId());
+            logger.info("Received message for Request id : {}", consentRequest.getId());
+            processConsentRequest(consentRequest);
+            MDC.clear();
+        } catch (Exception e) {
+            logger.debug("Exception in Consent Request Notification Consumer");
+            e.printStackTrace();
+        }
     }
 
     public Mono<Void> notifyUserWith(Notification<Content> notification) {

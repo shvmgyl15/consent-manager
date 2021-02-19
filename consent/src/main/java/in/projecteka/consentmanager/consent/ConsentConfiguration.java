@@ -1,18 +1,11 @@
 package in.projecteka.consentmanager.consent;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import in.projecteka.consentmanager.DestinationsConfig;
-import in.projecteka.consentmanager.MessageListenerContainerFactory;
-import in.projecteka.consentmanager.clients.ConsentArtefactNotifier;
 import in.projecteka.consentmanager.clients.ConsentManagerClient;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
+import in.projecteka.consentmanager.kafkaStreams.producer.ConsentNotificationProducer;
 import in.projecteka.consentmanager.properties.GatewayServiceProperties;
 import in.projecteka.consentmanager.properties.KeyPairConfig;
 import in.projecteka.consentmanager.properties.LinkServiceProperties;
-import in.projecteka.consentmanager.properties.ListenerProperties;
-import in.projecteka.library.clients.OtpServiceClient;
 import in.projecteka.library.clients.UserServiceClient;
 import in.projecteka.library.common.CentralRegistry;
 import in.projecteka.library.common.IdentityService;
@@ -20,9 +13,6 @@ import in.projecteka.library.common.ServiceAuthentication;
 import in.projecteka.library.common.cache.CacheAdapter;
 import io.vertx.pgclient.PgPool;
 import lombok.SneakyThrows;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -47,18 +37,6 @@ public class ConsentConfiguration {
     }
 
     @Bean
-    public ConsentNotificationPublisher postConsentApproval(AmqpTemplate amqpTemplate,
-                                                            DestinationsConfig destinationsConfig) {
-        return new ConsentNotificationPublisher(amqpTemplate, destinationsConfig);
-    }
-
-    @Bean
-    public PostConsentRequest postConsentRequestNotification(AmqpTemplate amqpTemplate,
-                                                             DestinationsConfig destinationsConfig) {
-        return new PostConsentRequest(amqpTemplate, destinationsConfig);
-    }
-
-    @Bean
     public PatientServiceClient patientServiceClient(
             @Qualifier("customBuilder") WebClient.Builder builder,
             @Value("${consentmanager.authorization.header}") String authorizationHeader,
@@ -77,9 +55,8 @@ public class ConsentConfiguration {
             ConsentRequestRepository repository,
             ConsentArtefactRepository consentArtefactRepository,
             KeyPair keyPair,
-            ConsentNotificationPublisher consentNotificationPublisher,
+            ConsentNotificationProducer consentNotificationProducer,
             CentralRegistry centralRegistry,
-            PostConsentRequest postConsentRequest,
             ConceptValidator conceptValidator,
             GatewayServiceProperties gatewayServiceProperties,
             PatientServiceClient patientServiceClient,
@@ -89,9 +66,8 @@ public class ConsentConfiguration {
                 repository,
                 consentArtefactRepository,
                 keyPair,
-                consentNotificationPublisher,
+                consentNotificationProducer,
                 centralRegistry,
-                postConsentRequest,
                 patientServiceClient,
                 new CMProperties(gatewayServiceProperties.getClientId()),
                 conceptValidator,
@@ -115,8 +91,8 @@ public class ConsentConfiguration {
             havingValue = "true")
     public ConsentScheduler consentScheduler(
             ConsentArtefactRepository consentArtefactRepository,
-            ConsentNotificationPublisher consentNotificationPublisher) {
-        return new ConsentScheduler(consentArtefactRepository, consentNotificationPublisher);
+            ConsentNotificationProducer consentNotificationProducer) {
+        return new ConsentScheduler(consentArtefactRepository, consentNotificationProducer);
     }
 
     @Bean
@@ -125,80 +101,8 @@ public class ConsentConfiguration {
             havingValue = "true")
     ConsentRequestScheduler consentRequestScheduler(ConsentRequestRepository repository,
                                                     ConsentServiceProperties consentServiceProperties,
-                                                    ConsentNotificationPublisher consentNotificationPublisher) {
-        return new ConsentRequestScheduler(repository, consentServiceProperties, consentNotificationPublisher);
-    }
-
-    @Bean
-    public Jackson2JsonMessageConverter converter() {
-        var objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
-
-    @Bean
-    public MessageListenerContainerFactory messageListenerContainerFactory(
-            ConnectionFactory connectionFactory,
-            Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
-        return new MessageListenerContainerFactory(connectionFactory, jackson2JsonMessageConverter);
-    }
-
-    @Bean
-    public ConsentArtefactNotifier consentArtefactClient(@Qualifier("customBuilder") WebClient.Builder builder,
-                                                         ServiceAuthentication serviceAuthentication,
-                                                         GatewayServiceProperties gatewayServiceProperties) {
-        return new ConsentArtefactNotifier(builder, serviceAuthentication::authenticate, gatewayServiceProperties);
-    }
-
-    @Bean
-    public HiuConsentNotificationListener hiuNotificationListener(
-            MessageListenerContainerFactory messageListenerContainerFactory,
-            Jackson2JsonMessageConverter jackson2JsonMessageConverter,
-            ConsentArtefactNotifier consentArtefactNotifier,
-            AmqpTemplate amqpTemplate,
-            ListenerProperties listenerProperties) {
-        return new HiuConsentNotificationListener(
-                messageListenerContainerFactory,
-                jackson2JsonMessageConverter,
-                consentArtefactNotifier,
-                amqpTemplate,
-                listenerProperties);
-    }
-
-    @Bean
-    public HipConsentNotificationListener hipNotificationListener(
-            MessageListenerContainerFactory messageListenerContainerFactory,
-            Jackson2JsonMessageConverter jackson2JsonMessageConverter,
-            ConsentArtefactNotifier consentArtefactNotifier,
-            ConsentArtefactRepository consentArtefactRepository,
-            CacheAdapter<String, String> hipConsentArtefactStatus) {
-        return new HipConsentNotificationListener(
-                messageListenerContainerFactory,
-                jackson2JsonMessageConverter,
-                consentArtefactNotifier,
-                consentArtefactRepository, hipConsentArtefactStatus);
-    }
-
-    @Bean
-    public ConsentRequestNotificationListener consentRequestNotificationListener(
-            MessageListenerContainerFactory messageListenerContainerFactory,
-            Jackson2JsonMessageConverter jackson2JsonMessageConverter,
-            OtpServiceClient otpServiceClient,
-            ConsentServiceProperties consentServiceProperties,
-            ConsentManager consentManager,
-            NHSProperties nhsProperties,
-            UserServiceClient userServiceClient,
-            PatientServiceClient patientServiceClient) {
-        return new ConsentRequestNotificationListener(
-                messageListenerContainerFactory,
-                jackson2JsonMessageConverter,
-                otpServiceClient,
-                userServiceClient,
-                consentServiceProperties,
-                consentManager,
-                patientServiceClient,
-                nhsProperties);
+                                                    ConsentNotificationProducer consentNotificationProducer) {
+        return new ConsentRequestScheduler(repository, consentServiceProperties, consentNotificationProducer);
     }
 
     @SneakyThrows
