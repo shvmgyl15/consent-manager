@@ -7,7 +7,7 @@ import in.projecteka.consentmanager.consent.model.ConsentArtefactsMessage;
 import in.projecteka.consentmanager.consent.model.request.ConsentArtefactReference;
 import in.projecteka.consentmanager.consent.model.request.ConsentNotifier;
 import in.projecteka.consentmanager.consent.model.request.HIUNotificationRequest;
-import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
+import in.projecteka.consentmanager.kafkaStreams.stream.IHiuConsentNotificationStream;
 import in.projecteka.consentmanager.properties.ListenerProperties;
 import in.projecteka.library.common.TraceableMessage;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ public class HiuConsentNotificationConsumer {
     private final ConsentArtefactNotifier consentArtefactNotifier;
     private final ListenerProperties listenerProperties;
 
-    @StreamListener(IConsentNotificationStream.INPUT_HIU_CONSENT_NOTIFICATION_QUEUE)
+    @StreamListener(IHiuConsentNotificationStream.INPUT_HIU_CONSENT_NOTIFICATION_QUEUE)
     public void subscribe(String message) {
         try {
             //This is NOT a generic solution. Based on the context, it either needs to retry, or it might also need to propagate the error to the upstream systems.

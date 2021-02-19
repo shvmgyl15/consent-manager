@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import in.projecteka.consentmanager.consent.model.ConsentArtefactsMessage;
 import in.projecteka.consentmanager.consent.model.ConsentRequest;
-import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
+import in.projecteka.consentmanager.kafkaStreams.stream.IConsentRequestStream;
+import in.projecteka.consentmanager.kafkaStreams.stream.IHipConsentNotificationStream;
+import in.projecteka.consentmanager.kafkaStreams.stream.IHiuConsentNotificationStream;
 import in.projecteka.library.common.TraceableMessage;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -24,7 +26,13 @@ public class ConsentNotificationProducer {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    IConsentNotificationStream iConsentNotificationStream;
+    IConsentRequestStream iConsentRequestStream;
+
+    @Autowired
+    IHipConsentNotificationStream iHipConsentNotificationStream;
+
+    @Autowired
+    IHiuConsentNotificationStream iHiuConsentNotificationStream;
 
     public Mono<Void> publish(ConsentArtefactsMessage message) {
         return Mono.create(monoSink -> {
@@ -38,7 +46,7 @@ public class ConsentNotificationProducer {
     private void broadcastArtefactsToHiu(ConsentArtefactsMessage message) {
 
         try {
-            MessageChannel messageChannel = iConsentNotificationStream.sendToHiu();
+            MessageChannel messageChannel = iHiuConsentNotificationStream.sendToHiu();
             messageChannel.send(MessageBuilder.withPayload(getMessage(message)).build());
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,7 +61,7 @@ public class ConsentNotificationProducer {
         message.getConsentArtefacts()
                 .forEach(consentArtefact -> {
                     try {
-                        MessageChannel messageChannel = iConsentNotificationStream.sendToHip();
+                        MessageChannel messageChannel = iHipConsentNotificationStream.sendToHip();
                         messageChannel.send(MessageBuilder.withPayload(getMessage(consentArtefact)).build());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -69,7 +77,7 @@ public class ConsentNotificationProducer {
     public Mono<Void> broadcastConsentRequestNotification(ConsentRequest consentRequest) {
         return Mono.create(monoSink -> {
             try {
-                MessageChannel messageChannel = iConsentNotificationStream.postConsentRequest();
+                MessageChannel messageChannel = iConsentRequestStream.postConsentRequest();
                 messageChannel.send(MessageBuilder.withPayload(getMessage(consentRequest)).build());
             } catch (Exception e) {
                 e.printStackTrace();

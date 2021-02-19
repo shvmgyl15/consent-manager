@@ -1,11 +1,10 @@
 package in.projecteka.dataflow.config;
 
-import in.projecteka.dataflow.kafkaStream.stream.IConsumerStream;
-import in.projecteka.dataflow.kafkaStream.stream.IProducerStream;
+import in.projecteka.dataflow.kafkaStream.stream.IHipDataflowRequestStream;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 
-@EnableBinding(value = {Source.class, IProducerStream.class, IConsumerStream.class})
+@EnableBinding(value = {Source.class, IHipDataflowRequestStream.class})
 public class StreamsConfig {
 }
 

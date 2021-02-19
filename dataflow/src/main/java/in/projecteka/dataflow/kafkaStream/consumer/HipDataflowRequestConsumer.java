@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import in.projecteka.dataflow.ConsentManagerClient;
 import in.projecteka.dataflow.DataRequestNotifier;
-import in.projecteka.dataflow.kafkaStream.stream.IConsumerStream;
+import in.projecteka.dataflow.kafkaStream.stream.IHipDataflowRequestStream;
 import in.projecteka.dataflow.model.DataFlowRequestMessage;
 import in.projecteka.dataflow.model.hip.DataRequest;
 import in.projecteka.dataflow.model.hip.HiRequest;
@@ -27,13 +27,13 @@ import static in.projecteka.dataflow.model.HipConsentArtefactNotificationStatus.
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
 @AllArgsConstructor
-public class MessageConsumer {
-	private final Logger log = LoggerFactory.getLogger(MessageConsumer.class);
+public class HipDataflowRequestConsumer {
+	private final Logger log = LoggerFactory.getLogger(HipDataflowRequestConsumer.class);
 
 	private final DataRequestNotifier dataRequestNotifier;
 	private final ConsentManagerClient consentManagerClient;
 
-	@StreamListener(IConsumerStream.INPUT)
+	@StreamListener(IHipDataflowRequestStream.INPUT)
 	public void process(String message) {
 		try {
 			log.info("Message from queue: {} ", message);

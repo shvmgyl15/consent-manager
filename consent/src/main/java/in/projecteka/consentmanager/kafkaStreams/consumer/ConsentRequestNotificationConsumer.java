@@ -12,7 +12,7 @@ import in.projecteka.consentmanager.consent.model.GrantedContext;
 import in.projecteka.consentmanager.consent.model.HIType;
 import in.projecteka.consentmanager.consent.model.request.GrantedConsent;
 import in.projecteka.consentmanager.consent.policies.NhsPolicyCheck;
-import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
+import in.projecteka.consentmanager.kafkaStreams.stream.IConsentRequestStream;
 import in.projecteka.library.clients.OtpServiceClient;
 import in.projecteka.library.clients.UserServiceClient;
 import in.projecteka.library.clients.model.Action;
@@ -44,7 +44,7 @@ public class ConsentRequestNotificationConsumer {
     private final PatientServiceClient patientServiceClient;
     private final NHSProperties nhsProperties;
 
-    @StreamListener(IConsentNotificationStream.INPUT_CONSENT_REQUEST_QUEUE)
+    @StreamListener(IConsentRequestStream.INPUT_CONSENT_REQUEST_QUEUE)
     public void subscribe(String message) {
         try {
             ObjectMapper mapper = new ObjectMapper();

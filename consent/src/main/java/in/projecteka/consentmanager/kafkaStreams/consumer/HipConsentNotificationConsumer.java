@@ -8,7 +8,7 @@ import in.projecteka.consentmanager.consent.ConsentNotificationReceiver;
 import in.projecteka.consentmanager.consent.model.ConsentNotificationStatus;
 import in.projecteka.consentmanager.consent.model.HIPConsentArtefactRepresentation;
 import in.projecteka.consentmanager.consent.model.request.HIPNotificationRequest;
-import in.projecteka.consentmanager.kafkaStreams.stream.IConsentNotificationStream;
+import in.projecteka.consentmanager.kafkaStreams.stream.IHipConsentNotificationStream;
 import in.projecteka.library.common.TraceableMessage;
 import in.projecteka.library.common.cache.CacheAdapter;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class HipConsentNotificationConsumer {
     private final ConsentArtefactRepository consentArtefactRepository;
     private final CacheAdapter<String, String> cache;
 
-    @StreamListener(IConsentNotificationStream.INPUT_HIP_CONSENT_NOTIFICATION_QUEUE)
+    @StreamListener(IHipConsentNotificationStream.INPUT_HIP_CONSENT_NOTIFICATION_QUEUE)
     public void subscribe(String message) {
         try {
             ObjectMapper mapper = new ObjectMapper();
