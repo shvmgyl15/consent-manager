@@ -83,11 +83,11 @@ spring:
           brokers: ${KAFKA_URL:http://13.71.113.65:9092}
           producer-properties:
             key.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-            value.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+            value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
           #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
           consumer-properties:
             key.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-            value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+            value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
             #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
             specific.avro.reader: true
             max.poll.records: 20
