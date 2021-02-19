@@ -1,5 +1,6 @@
 package in.projecteka.consentmanager.consent;
 
+import in.projecteka.consentmanager.clients.ConsentArtefactNotifier;
 import in.projecteka.consentmanager.clients.ConsentManagerClient;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
 import in.projecteka.consentmanager.kafkaStreams.producer.ConsentNotificationProducer;
@@ -115,5 +116,12 @@ public class ConsentConfiguration {
     public PinVerificationTokenService pinVerificationTokenService(@Qualifier("keySigningPublicKey") PublicKey key,
                                                                    CacheAdapter<String, String> usedTokens) {
         return new PinVerificationTokenService(key, usedTokens);
+    }
+
+    @Bean
+    public ConsentArtefactNotifier consentArtefactClient(@Qualifier("customBuilder") WebClient.Builder builder,
+                                                         ServiceAuthentication serviceAuthentication,
+                                                         GatewayServiceProperties gatewayServiceProperties) {
+        return new ConsentArtefactNotifier(builder, serviceAuthentication::authenticate, gatewayServiceProperties);
     }
 }
