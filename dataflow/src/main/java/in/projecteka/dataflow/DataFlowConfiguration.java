@@ -6,6 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.nimbusds.jose.jwk.JWKSet;
 import in.projecteka.dataflow.DestinationsConfig.DestinationInfo;
+import in.projecteka.dataflow.kafkaStream.consumer.MessageConsumer;
 import in.projecteka.dataflow.properties.DbOptions;
 import in.projecteka.dataflow.properties.*;
 import in.projecteka.library.clients.IdentityServiceClient;
@@ -198,6 +199,19 @@ public class DataFlowConfiguration {
                 dataFlowRequestRepository,
                 postDataFlowRequestApproval,
                 dataFlowRequestClient);
+    }
+
+    @Bean
+    public MessageConsumer messageConsumer(
+            @Qualifier("customBuilder") WebClient.Builder builder,
+            DataFlowConsentManagerProperties dataFlowConsentManagerProperties,
+            IdentityService identityService,
+            DataRequestNotifier dataRequestNotifier) {
+        return new MessageConsumer(
+                dataRequestNotifier,
+                new ConsentManagerClient(builder,
+                        dataFlowConsentManagerProperties.getUrl(),
+                        identityService::authenticate));
     }
 
     @Bean
