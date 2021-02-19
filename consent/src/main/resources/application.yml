@@ -73,9 +73,6 @@ consentmanager:
   linktokencache:
     expiry: ${LINK_TOKEN_CACHE_EXPIRY:1440}
 spring:
-  json:
-    trusted:
-      packages: in.projecteka.library.common.TraceableMessage
   cloud:
     stream:
       default:
@@ -88,11 +85,11 @@ spring:
           brokers: ${KAFKA_URL:http://13.71.113.65:9092}
           producer-properties:
             key.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-            value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            value.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
           #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
           consumer-properties:
             key.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-            value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
             #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
             specific.avro.reader: true
             max.poll.records: 20
@@ -100,28 +97,28 @@ spring:
             max.poll.interval.ms: 2400000
       bindings:
         input-consent-request-queue:
-          destination: consent-request-queue-01
+          destination: consent-request-queue-02
           group: consent-request-group
           contentType: application/json
         input-hiu-consent-notification-queue:
-          destination: hiu-consent-notification-queue-01
+          destination: hiu-consent-notification-queue-02
           group: hiu-consent-notification-group
           contentType: application/json
         input-hip-consent-notification-queue:
-          destination: hip-consent-notification-queue-01
+          destination: hip-consent-notification-queue-02
           group: hip-consent-notification-group
           contentType: application/json
         output-cm-hip-link-queue:
-          destination: cm-hip-link-queue-01
+          destination: cm-hip-link-queue-02
           contentType: application/json
         output-consent-request-queue:
-          destination: consent-request-queue-01
+          destination: consent-request-queue-02
           contentType: application/json
         output-hiu-consent-notification-queue:
-          destination: hiu-consent-notification-queue-01
+          destination: hiu-consent-notification-queue-02
           contentType: application/json
         output-hip-consent-notification-queue:
-          destination: hip-consent-notification-queue-01
+          destination: hip-consent-notification-queue-02
           contentType: application/json
   rabbitmq:
     host: ${RABBITMQ_HOST}

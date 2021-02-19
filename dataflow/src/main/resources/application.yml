@@ -36,17 +36,19 @@ spring:
     stream:
       default:
         producer:
-          useNativeEncoding: true
+          useNativeEncoding: false
+        consumer:
+          useNativeDecoding: false
       kafka:
         binder:
           brokers: ${KAFKA_URL:http://13.71.113.65:9092}
           producer-properties:
             key.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-            value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            value.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
           #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
           consumer-properties:
             key.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-            value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
             #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
             specific.avro.reader: true
             max.poll.records: 20
@@ -54,11 +56,11 @@ spring:
             max.poll.interval.ms: 2400000
       bindings:
         input-hip-data-flow-request-queue:
-          destination: hip-data-flow-request-queue-01
+          destination: hip-data-flow-request-queue-02
           group: hip-data-flow-request-group
           contentType: application/json
         output-hip-data-flow-request-queue:
-          destination: hip-data-flow-request-queue-01
+          destination: hip-data-flow-request-queue-02
           contentType: application/json
   rabbitmq:
     host: ${RABBITMQ_HOST}
