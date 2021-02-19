@@ -54,11 +54,11 @@ spring:
             max.poll.interval.ms: 2400000
       bindings:
         input-hip-data-flow-request-queue:
-          destination: hip-data-flow-request-queue
+          destination: hip-data-flow-request-queue-01
           group: hip-data-flow-request-group
           contentType: application/json
         output-hip-data-flow-request-queue:
-          destination: hip-data-flow-request-queue
+          destination: hip-data-flow-request-queue-01
           contentType: application/json
   rabbitmq:
     host: ${RABBITMQ_HOST}

@@ -100,28 +100,28 @@ spring:
             max.poll.interval.ms: 2400000
       bindings:
         input-consent-request-queue:
-          destination: consent-request-queue
+          destination: consent-request-queue-01
           group: consent-request-group
           contentType: application/json
         input-hiu-consent-notification-queue:
-          destination: hiu-consent-notification-queue
+          destination: hiu-consent-notification-queue-01
           group: hiu-consent-notification-group
           contentType: application/json
         input-hip-consent-notification-queue:
-          destination: hip-consent-notification-queue
+          destination: hip-consent-notification-queue-01
           group: hip-consent-notification-group
           contentType: application/json
         output-cm-hip-link-queue:
-          destination: cm-hip-link-queue
+          destination: cm-hip-link-queue-01
           contentType: application/json
         output-consent-request-queue:
-          destination: consent-request-queue
+          destination: consent-request-queue-01
           contentType: application/json
         output-hiu-consent-notification-queue:
-          destination: hiu-consent-notification-queue
+          destination: hiu-consent-notification-queue-01
           contentType: application/json
         output-hip-consent-notification-queue:
-          destination: hip-consent-notification-queue
+          destination: hip-consent-notification-queue-01
           contentType: application/json
   rabbitmq:
     host: ${RABBITMQ_HOST}
