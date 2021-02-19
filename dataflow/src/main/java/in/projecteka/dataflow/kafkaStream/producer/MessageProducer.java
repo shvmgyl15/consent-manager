@@ -1,6 +1,7 @@
 package in.projecteka.dataflow.kafkaStream.producer;
 
 import in.projecteka.dataflow.kafkaStream.stream.IProducerStream;
+import in.projecteka.library.common.TraceableMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class MessageProducer {
     @Autowired
     private IProducerStream iProducerStream;
 
-    public void produce(String message) {
+    public void produce(TraceableMessage message) {
         log.info("In produce message: {}", message);
         try {
             MessageChannel messageChannel = iProducerStream.produce();

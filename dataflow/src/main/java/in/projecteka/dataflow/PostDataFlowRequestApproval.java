@@ -1,14 +1,12 @@
 package in.projecteka.dataflow;
 
-import in.projecteka.dataflow.kafkaStream.stream.IProducerStream;
+import in.projecteka.dataflow.kafkaStream.producer.MessageProducer;
 import in.projecteka.dataflow.model.DataFlowRequestMessage;
 import in.projecteka.library.common.TraceableMessage;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +16,7 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @Slf4j
 @Service
 public class PostDataFlowRequestApproval {
-    private final IProducerStream iProducerStream;
+    private final MessageProducer messageProducer;
 
     @SneakyThrows
     public Mono<Void> broadcastDataFlowRequest(
@@ -34,12 +32,7 @@ public class PostDataFlowRequestApproval {
                 .build();
 
         return Mono.create(monoSink -> {
-            try {
-                MessageChannel messageChannel = iProducerStream.produce();
-                messageChannel.send(MessageBuilder.withPayload(traceableMessage).build());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            messageProducer.produce(traceableMessage);
             log.info("Broadcasting data flow request with transaction id : " + transactionId);
             monoSink.success();
         });
