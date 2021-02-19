@@ -1,6 +1,8 @@
 package in.projecteka.dataflow;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -49,6 +51,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static in.projecteka.dataflow.Constants.EXCHANGE;
 import static in.projecteka.dataflow.Constants.HIP_DATA_FLOW_REQUEST_QUEUE;
 import static in.projecteka.library.common.Constants.DEFAULT_CACHE_VALUE;
@@ -165,9 +168,10 @@ public class DataFlowConfiguration {
 
     @Bean
     public ObjectMapper mapper() {
-        ObjectMapper mapper = new ObjectMapper()
-                .findAndRegisterModules();
-        return mapper;
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
     @Bean

@@ -1,6 +1,8 @@
 package in.projecteka.consentmanager.consent;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import in.projecteka.consentmanager.clients.ConsentArtefactNotifier;
 import in.projecteka.consentmanager.clients.ConsentManagerClient;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
@@ -26,14 +28,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.security.KeyPair;
 import java.security.PublicKey;
 
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+
 @Configuration
 public class ConsentConfiguration {
 
     @Bean
     public ObjectMapper mapper() {
-        ObjectMapper mapper = new ObjectMapper()
-                .findAndRegisterModules();
-        return mapper;
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
     @Bean
