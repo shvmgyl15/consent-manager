@@ -35,6 +35,7 @@ public class HiuConsentNotificationConsumer {
 
     @StreamListener(IHiuConsentNotificationStream.INPUT_HIU_CONSENT_NOTIFICATION_QUEUE)
     public void subscribe(String message) {
+        logger.info("Consumer received message: {}", message);
         try {
             //This is NOT a generic solution. Based on the context, it either needs to retry, or it might also need to propagate the error to the upstream systems.
             //TODO be revisited during Gateway development
@@ -55,7 +56,7 @@ public class HiuConsentNotificationConsumer {
             notifyHiu(consentArtefactsMessage);
             MDC.clear();
         } catch (Exception e) {
-            logger.debug("Exception in HIU Consent Notification Consumer");
+            logger.error("Exception in HIU Consent Notification Consumer");
             e.printStackTrace();
         }
     }

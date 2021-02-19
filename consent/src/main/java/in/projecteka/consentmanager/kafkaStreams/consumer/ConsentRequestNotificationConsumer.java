@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static in.projecteka.library.common.Constants.CORRELATION_ID;
 
+@Service
 @AllArgsConstructor
 public class ConsentRequestNotificationConsumer {
 
@@ -46,6 +48,7 @@ public class ConsentRequestNotificationConsumer {
 
     @StreamListener(IConsentRequestStream.INPUT_CONSENT_REQUEST_QUEUE)
     public void subscribe(String message) {
+        logger.info("Consumer received message: {}", message);
         try {
             ObjectMapper mapper = new ObjectMapper();
             TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
@@ -56,7 +59,7 @@ public class ConsentRequestNotificationConsumer {
             processConsentRequest(consentRequest);
             MDC.clear();
         } catch (Exception e) {
-            logger.debug("Exception in Consent Request Notification Consumer");
+            logger.error("Exception in Consent Request Notification Consumer");
             e.printStackTrace();
         }
     }

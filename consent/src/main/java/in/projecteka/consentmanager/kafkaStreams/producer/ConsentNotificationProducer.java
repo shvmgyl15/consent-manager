@@ -92,6 +92,8 @@ public class ConsentNotificationProducer {
                 .correlationId(MDC.get(CORRELATION_ID))
                 .message(message)
                 .build();
-        return mapper.writeValueAsString(traceableMessage);
+        String msg = mapper.writeValueAsString(traceableMessage);
+        logger.info("Producer message: {}", msg);
+        return msg;
     }
 }
