@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Mono;
 
 import static in.projecteka.dataflow.Constants.HIP_DATA_FLOW_REQUEST_QUEUE;

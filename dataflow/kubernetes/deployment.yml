@@ -84,7 +84,9 @@ spec:
             value: "false"
           - name: "REDIS_RETRY"
             value: "0"
-          # RabbitMQ
+          # RabbitMQ/Kafka
+          - name: "SPRING_CLOUD_STREAM_KAFKA_BINDER_PRODUCER_PROPERTIES_SCHEMA_REGISTRY_URL"
+            value: "http://172.16.10.230:8081"
           - name: "RABBITMQ_HOST"
             value: "a1147c0a10bd24fd0bf0f7acb4846697-2045861127.us-east-2.elb.amazonaws.com"
           - name: "RABBITMQ_PORT"

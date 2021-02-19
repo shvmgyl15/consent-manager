@@ -27,8 +27,14 @@ bootJar {
 
 bootRunLocal.finalizedBy bootRun
 
+ext {
+    set('springCloudVersion', "Hoxton.SR10")
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'org.springframework.cloud:spring-cloud-stream'
+    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.data:spring-data-redis'
@@ -40,7 +46,6 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'io.vertx:vertx-pg-client:3.9.2'
     testImplementation 'org.jeasy:easy-random-core:4.2.0'
@@ -48,6 +53,12 @@ dependencies {
     implementation 'io.lettuce:lettuce-core:5.3.3.RELEASE'
 
     implementation project(':commons')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 jacocoTestReport {

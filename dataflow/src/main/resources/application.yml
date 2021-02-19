@@ -32,6 +32,34 @@ dataflow:
     read-from: ${READ_FROM:UPSTREAM}
     retry: ${REDIS_RETRY:0}
 spring:
+  cloud:
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+      kafka:
+        binder:
+          brokers: ${KAFKA_URL:http://13.71.113.65:9092}
+          producer-properties:
+            key.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+            value.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+          #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
+          consumer-properties:
+            key.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+            value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+            #            schema.registry.url: ${SCHEMA_REGISTRY_URL:http://13.71.113.65:8081}
+            specific.avro.reader: true
+            max.poll.records: 20
+            session.timeout.ms: 6000
+            max.poll.interval.ms: 2400000
+      bindings:
+        input-hip-data-flow-request-queue:
+          destination: hip-data-flow-request-queue
+          group: hip-data-flow-request-group
+          contentType: application/json
+        output-hip-data-flow-request-queue:
+          destination: hip-data-flow-request-queue
+          contentType: application/json
   rabbitmq:
     host: ${RABBITMQ_HOST}
     port: ${RABBITMQ_PORT}

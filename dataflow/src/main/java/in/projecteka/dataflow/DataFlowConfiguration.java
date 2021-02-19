@@ -31,9 +31,6 @@ import io.lettuce.core.SocketOptions;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -174,46 +171,9 @@ public class DataFlowConfiguration {
     }
 
     @Bean
-    public in.projecteka.dataflow.PostDataFlowRequestApproval postDataFlowRequestApproval(AmqpTemplate amqpTemplate,
-                                                                                          DestinationsConfig destinationsConfig) {
-        return new in.projecteka.dataflow.PostDataFlowRequestApproval(amqpTemplate, destinationsConfig);
-    }
-
-    @Bean
     public RequestValidator requestValidator(
             @Qualifier("cacheForReplayAttack") CacheAdapter<String, LocalDateTime> cacheForReplayAttack) {
         return new RequestValidator(cacheForReplayAttack);
-    }
-
-    @Bean
-    public Jackson2JsonMessageConverter converter() {
-        var objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
-
-    @Bean
-    public MessageListenerContainerFactory messageListenerContainerFactory(
-            ConnectionFactory connectionFactory,
-            Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
-        return new MessageListenerContainerFactory(connectionFactory, jackson2JsonMessageConverter);
-    }
-
-    @Bean
-    public DataFlowBroadcastListener dataFlowBroadcastListener(
-            @Qualifier("customBuilder") WebClient.Builder builder,
-            DataFlowConsentManagerProperties dataFlowConsentManagerProperties,
-            IdentityService identityService,
-            MessageListenerContainerFactory messageListenerContainerFactory,
-            Jackson2JsonMessageConverter jackson2JsonMessageConverter,
-            DataRequestNotifier dataRequestNotifier) {
-        return new DataFlowBroadcastListener(messageListenerContainerFactory,
-                jackson2JsonMessageConverter,
-                dataRequestNotifier,
-                new ConsentManagerClient(builder,
-                        dataFlowConsentManagerProperties.getUrl(),
-                        identityService::authenticate));
     }
 
     @Bean
