@@ -73,6 +73,9 @@ consentmanager:
   linktokencache:
     expiry: ${LINK_TOKEN_CACHE_EXPIRY:1440}
 spring:
+  json:
+    trusted:
+      packages: in.projecteka.library.common.TraceableMessage
   cloud:
     stream:
       default:
