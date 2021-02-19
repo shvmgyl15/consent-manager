@@ -1,5 +1,6 @@
 package in.projecteka.consentmanager.consent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.projecteka.consentmanager.clients.ConsentArtefactNotifier;
 import in.projecteka.consentmanager.clients.ConsentManagerClient;
 import in.projecteka.consentmanager.clients.PatientServiceClient;
@@ -27,6 +28,13 @@ import java.security.PublicKey;
 
 @Configuration
 public class ConsentConfiguration {
+
+    @Bean
+    public ObjectMapper mapper() {
+        ObjectMapper mapper = new ObjectMapper()
+                .findAndRegisterModules();
+        return mapper;
+    }
 
     @Bean
     public ConsentRequestRepository consentRequestRepository(PgPool pgPool) {
@@ -99,10 +107,12 @@ public class ConsentConfiguration {
 
     @Bean
     public HipConsentNotificationConsumer hipConsentNotificationConsumer(
+            ObjectMapper mapper,
             ConsentArtefactNotifier consentArtefactNotifier,
             ConsentArtefactRepository consentArtefactRepository,
             CacheAdapter<String, String> hipConsentArtefactStatus) {
         return new HipConsentNotificationConsumer(
+                mapper,
                 consentArtefactNotifier,
                 consentArtefactRepository,
                 hipConsentArtefactStatus);

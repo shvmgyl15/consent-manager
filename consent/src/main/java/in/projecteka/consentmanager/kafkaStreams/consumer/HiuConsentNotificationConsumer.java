@@ -30,6 +30,7 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @AllArgsConstructor
 public class HiuConsentNotificationConsumer {
     private static final Logger logger = LoggerFactory.getLogger(HiuConsentNotificationConsumer.class);
+    private final ObjectMapper mapper;
     private final ConsentArtefactNotifier consentArtefactNotifier;
     private final ListenerProperties listenerProperties;
 
@@ -45,7 +46,6 @@ public class HiuConsentNotificationConsumer {
             //                            message);
             //                    return;
             //                }
-            ObjectMapper mapper = new ObjectMapper();
             TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
             mapper.registerModule(new JavaTimeModule());
             ConsentArtefactsMessage consentArtefactsMessage = mapper.convertValue(

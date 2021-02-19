@@ -30,6 +30,7 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 public class HipDataflowRequestConsumer {
 	private final Logger log = LoggerFactory.getLogger(HipDataflowRequestConsumer.class);
 
+	private final ObjectMapper mapper;
 	private final DataRequestNotifier dataRequestNotifier;
 	private final ConsentManagerClient consentManagerClient;
 
@@ -37,7 +38,6 @@ public class HipDataflowRequestConsumer {
 	public void process(String message) {
 		try {
 			log.info("Message from queue: {} ", message);
-			ObjectMapper mapper = new ObjectMapper();
 			mapper.registerModule(new JavaTimeModule());
 			TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
 			DataFlowRequestMessage dataFlowRequestMessage = mapper.convertValue(traceableMessage.getMessage(), DataFlowRequestMessage.class);

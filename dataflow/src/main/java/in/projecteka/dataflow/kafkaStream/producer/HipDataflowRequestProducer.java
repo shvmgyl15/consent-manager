@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class HipDataflowRequestProducer {
     private final Logger log = LoggerFactory.getLogger(HipDataflowRequestProducer.class);
-    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     private IHipDataflowRequestStream iHipDataFlowRequestStream;

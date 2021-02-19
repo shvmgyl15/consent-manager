@@ -39,6 +39,7 @@ public class ConsentRequestNotificationConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(ConsentRequestNotificationConsumer.class);
 
+    private final ObjectMapper mapper;
     private final OtpServiceClient consentNotificationClient;
     private final UserServiceClient userServiceClient;
     private final ConsentServiceProperties consentServiceProperties;
@@ -50,7 +51,6 @@ public class ConsentRequestNotificationConsumer {
     public void subscribe(String message) {
         logger.info("Consumer received message: {}", message);
         try {
-            ObjectMapper mapper = new ObjectMapper();
             TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
             mapper.registerModule(new JavaTimeModule());
             ConsentRequest consentRequest = mapper.convertValue(traceableMessage.getMessage(), ConsentRequest.class);

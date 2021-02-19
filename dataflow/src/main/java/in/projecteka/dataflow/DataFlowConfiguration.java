@@ -164,6 +164,13 @@ public class DataFlowConfiguration {
     }
 
     @Bean
+    public ObjectMapper mapper() {
+        ObjectMapper mapper = new ObjectMapper()
+                .findAndRegisterModules();
+        return mapper;
+    }
+
+    @Bean
     public DataFlowRequestClient dataFlowRequestClient(@Qualifier("customBuilder") WebClient.Builder builder,
                                                        GatewayServiceProperties gatewayServiceProperties,
                                                        ServiceAuthentication serviceAuthentication) {
@@ -203,11 +210,13 @@ public class DataFlowConfiguration {
 
     @Bean
     public HipDataflowRequestConsumer messageConsumer(
+            ObjectMapper mapper,
             @Qualifier("customBuilder") WebClient.Builder builder,
             DataFlowConsentManagerProperties dataFlowConsentManagerProperties,
             IdentityService identityService,
             DataRequestNotifier dataRequestNotifier) {
         return new HipDataflowRequestConsumer(
+                mapper,
                 dataRequestNotifier,
                 new ConsentManagerClient(builder,
                         dataFlowConsentManagerProperties.getUrl(),

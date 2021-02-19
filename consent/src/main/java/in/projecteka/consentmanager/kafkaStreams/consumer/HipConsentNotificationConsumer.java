@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -31,6 +30,8 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @AllArgsConstructor
 public class HipConsentNotificationConsumer {
     private static final Logger logger = LoggerFactory.getLogger(HipConsentNotificationConsumer.class);
+
+    private final ObjectMapper mapper;
     private final ConsentArtefactNotifier consentArtefactNotifier;
     private final ConsentArtefactRepository consentArtefactRepository;
     private final CacheAdapter<String, String> cache;
@@ -39,7 +40,6 @@ public class HipConsentNotificationConsumer {
     public void subscribe(String message) {
         logger.info("Consumer received message: {}", message);
         try {
-            ObjectMapper mapper = new ObjectMapper();
             TraceableMessage traceableMessage = mapper.readValue(message, TraceableMessage.class);
             mapper.registerModule(new JavaTimeModule());
             HIPConsentArtefactRepresentation consentArtefact = mapper.convertValue(traceableMessage.getMessage()

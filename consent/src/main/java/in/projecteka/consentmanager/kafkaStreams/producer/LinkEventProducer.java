@@ -18,7 +18,9 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @Service
 public class LinkEventProducer {
     private static final Logger logger = LoggerFactory.getLogger(LinkEventProducer.class);
-    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     IHipLinkStream iHipLinkStream;

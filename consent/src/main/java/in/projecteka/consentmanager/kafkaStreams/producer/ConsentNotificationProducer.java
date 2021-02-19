@@ -23,7 +23,9 @@ import static in.projecteka.library.common.Constants.CORRELATION_ID;
 @Service
 public class ConsentNotificationProducer {
     private static final Logger logger = LoggerFactory.getLogger(ConsentNotificationProducer.class);
-    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     IConsentRequestStream iConsentRequestStream;
